@@ -203,7 +203,9 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
     <button class="btn btn-ghost wide" id="dlAllBtn" disabled>Baixar todas as fotos</button>
     <button class="btn btn-ghost wide" id="demoBtn">Ver com foto de exemplo</button>
 
-    <div class="slabel">Descrição para eBay (IA)</div>
+    <div class="slabel">Descrição para eBay (IA grátis)</div>
+    <input type="password" class="tin" id="gemKey" placeholder="Chave do Google AI Studio — cole aqui"/>
+    <div style="font-size:11px;color:var(--text3);margin:-3px 0 9px;line-height:1.5">Grátis, sem cartão: crie em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a>. A chave fica salva só neste navegador.</div>
     <input type="text" class="tin" id="descInfo" placeholder="Nome/detalhes do item (opcional) — ex: Star Wars sign"/>
     <button class="btn btn-accent wide" id="genDescBtn" disabled>✨ Gerar descrição</button>
     <div class="ai-out" id="aiOut" style="display:none"></div>
@@ -700,8 +702,9 @@ $('dlAllBtn').onclick=async()=>{
   toast(ready.length+' foto(s) salvas!');
 };
 
-/* ══════════ AI DESCRIPTION ══════════ */
-const AI_PROXY='https://ebay-proxy.bruneraas.workers.dev/';
+/* ══════════ AI DESCRIPTION (Google Gemini — free tier) ══════════ */
+$('gemKey').value = localStorage.getItem('medidas_gemkey') || '';
+$('gemKey').addEventListener('input', e=>localStorage.setItem('medidas_gemkey', e.target.value.trim()));
 
 function photoBase64(p){
   const MAX=1024, img=p.img;
@@ -761,19 +764,20 @@ Write ONLY the description text, nothing else.`;
 }
 
 async function callAI(prompt, imgB64){
+  const key=$('gemKey').value.trim();
   let lastErr='';
-  for(const model of ['claude-sonnet-5','claude-sonnet-4-20250514']){
+  for(const model of ['gemini-2.5-flash','gemini-2.0-flash']){
     try{
-      const res=await fetch(AI_PROXY,{
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model, max_tokens:1000, messages:[{role:'user', content:[
-          {type:'image', source:{type:'base64', media_type:'image/jpeg', data:imgB64}},
-          {type:'text', text:prompt}
+        body:JSON.stringify({contents:[{parts:[
+          {inline_data:{mime_type:'image/jpeg', data:imgB64}},
+          {text:prompt}
         ]}]})
       });
       const data=await res.json();
-      const txt=data?.content?.[0]?.text;
-      if(txt) return txt;
+      const txt=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');
+      if(txt && txt.trim()) return txt;
       lastErr=data?.error?.message||('HTTP '+res.status);
     }catch(e){ lastErr=e.message; }
   }
@@ -782,6 +786,11 @@ async function callAI(prompt, imgB64){
 
 $('genDescBtn').onclick=async()=>{
   if(!cur) return;
+  if(!$('gemKey').value.trim()){
+    const out=$('aiOut'); out.style.display='block'; out.classList.remove('loading');
+    out.textContent='⚠ Cole sua chave gratuita do Google AI Studio no campo acima.\n\n1. Acesse aistudio.google.com/apikey\n2. Entre com sua conta Google\n3. Clique em "Create API key" e copie\n4. Cole no campo acima — fica salva para as próximas vezes';
+    $('gemKey').focus(); return;
+  }
   const btn=$('genDescBtn'), out=$('aiOut'), cp=$('copyDescBtn');
   btn.disabled=true; btn.textContent='Gerando…';
   out.style.display='block'; out.classList.add('loading');
