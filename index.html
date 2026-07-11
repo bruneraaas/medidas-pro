@@ -204,8 +204,12 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
     <button class="btn btn-ghost wide" id="demoBtn">Ver com foto de exemplo</button>
 
     <div class="slabel">Descrição para eBay (IA grátis)</div>
-    <input type="password" class="tin" id="gemKey" placeholder="Chave do Google AI Studio — cole aqui"/>
-    <div style="font-size:11px;color:var(--text3);margin:-3px 0 9px;line-height:1.5">Grátis, sem cartão: crie em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a>. A chave fica salva só neste navegador.</div>
+    <div style="display:flex;gap:7px;margin-bottom:6px">
+      <input type="password" class="tin" id="gemKey" style="flex:1;margin-bottom:0" placeholder="Chave do Google AI Studio — cole aqui"/>
+      <button class="btn btn-accent" id="saveKeyBtn" style="padding:9px 14px;flex-shrink:0">Salvar</button>
+    </div>
+    <div id="keyStatus" style="font-size:11px;color:var(--accent);margin:0 0 6px;display:none">✓ Chave salva neste navegador</div>
+    <div style="font-size:11px;color:var(--text3);margin:0 0 9px;line-height:1.5">Grátis, sem cartão: crie em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a>.</div>
     <input type="text" class="tin" id="descInfo" placeholder="Nome/detalhes do item (opcional) — ex: Star Wars sign"/>
     <button class="btn btn-accent wide" id="genDescBtn" disabled>✨ Gerar descrição</button>
     <div class="ai-out" id="aiOut" style="display:none"></div>
@@ -703,8 +707,18 @@ $('dlAllBtn').onclick=async()=>{
 };
 
 /* ══════════ AI DESCRIPTION (Google Gemini — free tier) ══════════ */
+function saveKey(announce){
+  localStorage.setItem('medidas_gemkey', $('gemKey').value.trim());
+  refreshKeyStatus();
+  if(announce) toast($('gemKey').value.trim()? '🔑 Chave salva!' : 'Chave removida');
+}
+function refreshKeyStatus(){
+  $('keyStatus').style.display = ($('gemKey').value.trim()? 'block':'none');
+}
 $('gemKey').value = localStorage.getItem('medidas_gemkey') || '';
-$('gemKey').addEventListener('input', e=>localStorage.setItem('medidas_gemkey', e.target.value.trim()));
+refreshKeyStatus();
+$('gemKey').addEventListener('input', ()=>saveKey(false));
+$('saveKeyBtn').onclick=()=>saveKey(true);
 
 function photoBase64(p){
   const MAX=1024, img=p.img;
