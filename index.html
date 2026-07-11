@@ -129,7 +129,7 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay</div>
+        <div class="sub">Fotos com medidas para eBay · v1.7</div>
       </div>
     </div>
 
@@ -638,7 +638,7 @@ cv.addEventListener('pointermove',e=>{
     return;
   }
   const m=drag.m, o=drag.o;
-  if(Math.hypot(x-drag.sx, y-drag.sy)>4) drag.moved=true;
+  if(Math.hypot(x-drag.sx, y-drag.sy)>8) drag.moved=true;
   const ndx=(x-drag.sx)/view.w, ndy=(y-drag.sy)/view.h;
   const C=v=>clamp(v,0.004,0.996);
   if(drag.mode==='move'){
@@ -659,11 +659,19 @@ cv.addEventListener('pointermove',e=>{
 window.addEventListener('pointerup',()=>{
   if(!drag) return;
   const d=drag; drag=null; guides.v=guides.h=false; draw();
+  lastMoved=d.moved;
   if(d.mode==='label' && !d.moved) openInlineEdit(d.m);   // clique simples no texto → edita ali mesmo
+});
+// caminho reserva: o evento click do navegador só dispara em clique real
+cv.addEventListener('click',e=>{
+  if(inlineEd || lastMoved) return;
+  const hit=hitTest(e.offsetX,e.offsetY);
+  if(hit && hit.mode==='label'){ sel=hit.m; renderList(); draw(); openInlineEdit(hit.m); }
 });
 
 /* ══════════ INLINE EDIT (clicar no valor edita na foto) ══════════ */
 let inlineEd=null;
+let lastMoved=false;
 function openInlineEdit(m){
   closeInlineEdit();
   const h=m._hit && m._hit.label; if(!h) return;
