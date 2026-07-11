@@ -102,6 +102,12 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
 .btn svg{width:16px;height:16px;stroke-width:2.2}
 .wide{width:100%;margin-bottom:8px}
 
+.tin{width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;padding:9px 10px;outline:none;font-family:'Inter';margin-bottom:8px}
+.tin:focus{border-color:var(--accent)}
+.tin::placeholder{color:var(--text3)}
+.ai-out{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:12.5px;line-height:1.6;white-space:pre-wrap;margin-bottom:8px;user-select:text;max-height:340px;overflow-y:auto;color:var(--text)}
+.ai-out.loading{color:var(--text2);font-style:italic}
+
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--accent);color:#0e0f12;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
@@ -196,6 +202,12 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
     </button>
     <button class="btn btn-ghost wide" id="dlAllBtn" disabled>Baixar todas as fotos</button>
     <button class="btn btn-ghost wide" id="demoBtn">Ver com foto de exemplo</button>
+
+    <div class="slabel">Descrição para eBay (IA)</div>
+    <input type="text" class="tin" id="descInfo" placeholder="Nome/detalhes do item (opcional) — ex: Star Wars sign"/>
+    <button class="btn btn-accent wide" id="genDescBtn" disabled>✨ Gerar descrição</button>
+    <div class="ai-out" id="aiOut" style="display:none"></div>
+    <button class="btn btn-ghost wide" id="copyDescBtn" style="display:none">📋 Copiar descrição</button>
   </aside>
 
   <main>
@@ -306,6 +318,7 @@ function selectPhoto(p){
   $('redetectBtn').style.display = p? 'inline-flex':'none';
   $('dlBtn').disabled = !p;
   $('dlAllBtn').disabled = photos.length===0;
+  $('genDescBtn').disabled = !p;
   renderStrip(); renderList(); draw();
 }
 
@@ -685,6 +698,111 @@ $('dlAllBtn').onclick=async()=>{
     await new Promise(r=>setTimeout(r,400));
   }
   toast(ready.length+' foto(s) salvas!');
+};
+
+/* ══════════ AI DESCRIPTION ══════════ */
+const AI_PROXY='https://ebay-proxy.bruneraas.workers.dev/';
+
+function photoBase64(p){
+  const MAX=1024, img=p.img;
+  const s=Math.min(1, MAX/Math.max(img.naturalWidth, img.naturalHeight));
+  const w=Math.round(img.naturalWidth*s), h=Math.round(img.naturalHeight*s);
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  c.getContext('2d').drawImage(img,0,0,w,h);
+  return c.toDataURL('image/jpeg',0.72).split(',')[1];
+}
+
+function collectDims(p){
+  const map={width:'Width', height:'Height', free:'Depth'};
+  const dims=[], tags=[];
+  p.ms.forEach(m=>{
+    if(m.type==='text'){ if(m.text&&m.text.trim()) tags.push(m.text.trim()); return; }
+    const v=parseFloat(m.value);
+    if(v){ const cm=toCm(v,m.unit); dims.push(`${map[m.type]}: ${fmtNum(cm,1)} cm (${fmtNum(cm/2.54,2)} in)`); }
+  });
+  return {dims,tags};
+}
+
+function descPrompt(p){
+  const {dims,tags}=collectDims(p);
+  const extra=$('descInfo').value.trim();
+  return `You are an expert eBay seller of 3D printed decorative items. Look at this product photo carefully and write an eBay listing description in English following EXACTLY this template (same structure, same emojis, same spacing):
+
+[Product Name] – [Short Descriptor, e.g. "Freestanding Display"]
+
+[Engaging 2–3 sentence opening paragraph about the product and what makes it special]
+
+📏 Dimensions (approx.):
+
+Width: 20 cm (7.87 in)
+Height: 19 cm (7.48 in)
+Depth: 10 cm (3.93 in)
+
+✨ Features:
+
+Solid construction with textured finish
+3D freestanding design – no installation required
+Vibrant color for strong visual impact
+Ideal for shelves, desks, gaming setups, or themed décor
+
+🎁 Perfect for:
+[One sentence: collectors, fans, gift buyers relevant to THIS item]
+
+[One closing sentence encouraging the purchase, matching the item's theme]
+
+Rules:
+- The Dimensions section must use ONLY the real measurements listed below, one per line, omitting any that are not provided
+- Identify the product from the photo and adapt the name, opening, features and audience to it
+- Features: 4 short lines based on what you actually see (material look, freestanding base, colors, use cases)
+- Professional but warm tone. No hashtags, no markdown symbols, no extra sections. Under 220 words
+${extra? '\nSeller info about the item: '+extra : ''}${dims.length? '\nReal measurements:\n'+dims.join('\n') : '\nNo measurements provided — omit the 📏 Dimensions section entirely.'}${tags.length? '\nLabels shown on the listing photo: '+tags.join(' · ') : ''}
+
+Write ONLY the description text, nothing else.`;
+}
+
+async function callAI(prompt, imgB64){
+  let lastErr='';
+  for(const model of ['claude-sonnet-5','claude-sonnet-4-20250514']){
+    try{
+      const res=await fetch(AI_PROXY,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model, max_tokens:1000, messages:[{role:'user', content:[
+          {type:'image', source:{type:'base64', media_type:'image/jpeg', data:imgB64}},
+          {type:'text', text:prompt}
+        ]}]})
+      });
+      const data=await res.json();
+      const txt=data?.content?.[0]?.text;
+      if(txt) return txt;
+      lastErr=data?.error?.message||('HTTP '+res.status);
+    }catch(e){ lastErr=e.message; }
+  }
+  throw new Error(lastErr||'sem resposta');
+}
+
+$('genDescBtn').onclick=async()=>{
+  if(!cur) return;
+  const btn=$('genDescBtn'), out=$('aiOut'), cp=$('copyDescBtn');
+  btn.disabled=true; btn.textContent='Gerando…';
+  out.style.display='block'; out.classList.add('loading');
+  out.textContent='Analisando a foto e as medidas…';
+  cp.style.display='none';
+  try{
+    const txt=await callAI(descPrompt(cur), photoBase64(cur));
+    out.classList.remove('loading');
+    out.textContent=txt.trim();
+    cp.style.display='inline-flex';
+  }catch(e){
+    out.classList.remove('loading');
+    out.textContent='Erro ao gerar descrição: '+e.message;
+  }
+  btn.disabled=false; btn.textContent='✨ Gerar descrição';
+};
+
+$('copyDescBtn').onclick=async()=>{
+  await navigator.clipboard.writeText($('aiOut').textContent);
+  const b=$('copyDescBtn'); b.textContent='✅ Copiado!';
+  setTimeout(()=>b.textContent='📋 Copiar descrição',2000);
 };
 
 /* ══════════ DEMO IMAGE ══════════ */
