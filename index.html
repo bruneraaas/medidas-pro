@@ -777,25 +777,74 @@ ${extra? '\nSeller info about the item: '+extra : ''}${dims.length? '\nReal meas
 Write ONLY the description text, nothing else.`;
 }
 
-async function callAI(prompt, imgB64){
+let gemCache={key:'', list:null};
+async function listGemModels(key){
+  if(gemCache.key===key && gemCache.list) return gemCache.list;
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}&pageSize=1000`);
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    gemCache={key, list:(data.models||[])
+      .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+      .map(m=>m.name.replace('models/',''))};
+  }catch(e){ gemCache={key, list:[]}; }
+  return gemCache.list;
+}
+// preference order: newest/cheapest free-tier models first
+const GEM_PREFS=['gemini-3-flash','gemini-flash-latest','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.0-flash'];
+function pickGemModels(avail){
+  const picked=[];
+  for(const pref of GEM_PREFS){
+    const m=avail.find(a=>a.startsWith(pref) && !a.includes('thinking') && !picked.includes(a));
+    if(m) picked.push(m);
+  }
+  if(!picked.length) picked.push(...avail.filter(a=>a.includes('flash')).slice(0,4));
+  return picked.length? picked : ['gemini-2.5-flash-lite','gemini-2.5-flash'];
+}
+
+async function callAI(prompt, imgB64, onStatus){
   const key=$('gemKey').value.trim();
+  const models=pickGemModels(await listGemModels(key));
   let lastErr='';
-  for(const model of ['gemini-2.5-flash','gemini-2.0-flash']){
-    try{
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[
-          {inline_data:{mime_type:'image/jpeg', data:imgB64}},
-          {text:prompt}
-        ]}]})
-      });
-      const data=await res.json();
-      const txt=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');
-      if(txt && txt.trim()) return txt;
-      lastErr=data?.error?.message||('HTTP '+res.status);
-    }catch(e){ lastErr=e.message; }
+  for(const model of models){
+    for(let attempt=0; attempt<2; attempt++){
+      try{
+        if(onStatus) onStatus(`Gerando com ${model}…`);
+        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({contents:[{parts:[
+            {inline_data:{mime_type:'image/jpeg', data:imgB64}},
+            {text:prompt}
+          ]}]})
+        });
+        const data=await res.json();
+        const txt=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');
+        if(txt && txt.trim()) return txt;
+        const msg=data?.error?.message||('HTTP '+res.status);
+        lastErr=model+': '+msg;
+        if(res.status===429 && attempt===0 && !/limit:\s*0/.test(msg)){
+          // rate-limit momentâneo: espera o tempo sugerido e tenta 1x de novo
+          const m=msg.match(/retry in ([\d.]+)s/i);
+          const wait=Math.min((m? parseFloat(m[1]):8)+1, 25);
+          if(onStatus) onStatus(`Limite de velocidade — aguardando ${Math.ceil(wait)}s para tentar de novo…`);
+          await new Promise(r=>setTimeout(r, wait*1000));
+          continue;
+        }
+        break; // sem cota neste modelo → tenta o próximo
+      }catch(e){ lastErr=e.message; break; }
+    }
   }
   throw new Error(lastErr||'sem resposta');
+}
+
+function friendlyAIError(msg){
+  if(/API key not valid|API_KEY_INVALID/i.test(msg))
+    return 'Chave inválida — confira se copiou a chave completa do aistudio.google.com/apikey.';
+  if(/limit:\s*0/.test(msg))
+    return 'Sua chave não tem cota gratuita para os modelos disponíveis. Crie uma chave nova em aistudio.google.com/apikey (botão "Create API key", escolhendo criar um projeto novo) e cole aqui.\n\nDetalhe técnico: '+msg;
+  if(/quota|429|RESOURCE_EXHAUSTED/i.test(msg))
+    return 'Limite gratuito atingido neste minuto. Aguarde ~1 minuto e clique de novo.\n\nDetalhe técnico: '+msg;
+  return msg;
 }
 
 $('genDescBtn').onclick=async()=>{
@@ -811,13 +860,13 @@ $('genDescBtn').onclick=async()=>{
   out.textContent='Analisando a foto e as medidas…';
   cp.style.display='none';
   try{
-    const txt=await callAI(descPrompt(cur), photoBase64(cur));
+    const txt=await callAI(descPrompt(cur), photoBase64(cur), s=>{ out.textContent=s; });
     out.classList.remove('loading');
     out.textContent=txt.trim();
     cp.style.display='inline-flex';
   }catch(e){
     out.classList.remove('loading');
-    out.textContent='Erro ao gerar descrição: '+e.message;
+    out.textContent='⚠ '+friendlyAIError(e.message);
   }
   btn.disabled=false; btn.textContent='✨ Gerar descrição';
 };
