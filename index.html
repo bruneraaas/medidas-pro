@@ -225,6 +225,7 @@ let photos = [];          // {id,name,img,url,ms:[measure],bbox}
 let cur = null;           // current photo
 let sel = null;           // selected measure
 let drag = null;
+let guides = {v:false, h:false};   // center-snap guide lines while dragging
 let idSeq = 1;
 
 const defStyle = {color:'#111111', halo:false, thick:1, fsize:1, format:'cm-in', font:'Saira Condensed', squarePad:false};
@@ -500,6 +501,14 @@ function draw(){
   ctx.restore();
   ctx.drawImage(img,view.x,view.y,iw,ih);
   cur.ms.forEach(m=>drawMeasure(ctx,m,view.x,view.y,iw,ih,true));
+  if(drag && (guides.v||guides.h)){
+    ctx.save();
+    ctx.strokeStyle='#22c9ff'; ctx.lineWidth=1.5; ctx.setLineDash([7,5]);
+    ctx.shadowColor='rgba(34,201,255,.6)'; ctx.shadowBlur=4;
+    if(guides.v){ ctx.beginPath(); ctx.moveTo(view.x+iw/2,view.y); ctx.lineTo(view.x+iw/2,view.y+ih); ctx.stroke(); }
+    if(guides.h){ ctx.beginPath(); ctx.moveTo(view.x,view.y+ih/2); ctx.lineTo(view.x+iw,view.y+ih/2); ctx.stroke(); }
+    ctx.restore();
+  }
 }
 
 function drawMeasure(c,m,ox,oy,iw,ih,interactive){
@@ -623,9 +632,24 @@ cv.addEventListener('pointermove',e=>{
     m.x2=C(o.x2+ndx); m.y2=C(o.y2+ndy);
     if(m.type==='width') m.y1=m.y2; if(m.type==='height') m.x1=m.x2;
   }
+  snapGuides(m, drag.mode);
   draw();
 });
-window.addEventListener('pointerup',()=>{ drag=null; });
+window.addEventListener('pointerup',()=>{ if(drag){ drag=null; guides.v=guides.h=false; draw(); } });
+
+/* Instagram-style center snapping: stick to the photo center and show guide lines */
+function snapGuides(m, mode){
+  guides.v=false; guides.h=false;
+  const T=0.013;
+  if(mode==='label'){
+    if(Math.abs(m.lx-0.5)<T){ m.lx=0.5; guides.v=true; }
+    if(Math.abs(m.ly-0.5)<T){ m.ly=0.5; guides.h=true; }
+  }else if(mode==='move'){
+    const mx=(m.x1+m.x2)/2, my=(m.y1+m.y2)/2;
+    if(Math.abs(mx-0.5)<T){ const d=0.5-mx; m.x1+=d; m.x2+=d; m.lx+=d; guides.v=true; }
+    if(Math.abs(my-0.5)<T){ const d=0.5-my; m.y1+=d; m.y2+=d; m.ly+=d; guides.h=true; }
+  }
+}
 
 /* ══════════ EXPORT ══════════ */
 function exportPhoto(p){
