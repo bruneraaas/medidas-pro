@@ -229,7 +229,7 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
         <div class="big">Adicione uma foto para começar</div>
         <div class="small">Arraste aqui, clique na barra lateral, ou cole com <kbd>Ctrl+V</kbd></div>
       </div>
-      <div id="hint" style="opacity:0">Arraste as setas, as pontas e os textos direto na foto</div>
+      <div id="hint" style="opacity:0">Arraste as setas e os textos · clique no valor para digitar direto na foto</div>
     </div>
   </main>
 </div>
@@ -620,11 +620,12 @@ function hitTest(x,y){
   return null;
 }
 cv.addEventListener('pointerdown',e=>{
+  closeInlineEdit();
   const x=e.offsetX, y=e.offsetY;
   const hit=hitTest(x,y);
   if(hit){
     sel=hit.m; renderList();
-    drag={...hit, sx:x, sy:y, o:{x1:hit.m.x1,y1:hit.m.y1,x2:hit.m.x2,y2:hit.m.y2,lx:hit.m.lx,ly:hit.m.ly}};
+    drag={...hit, sx:x, sy:y, moved:false, o:{x1:hit.m.x1,y1:hit.m.y1,x2:hit.m.x2,y2:hit.m.y2,lx:hit.m.lx,ly:hit.m.ly}};
     cv.setPointerCapture(e.pointerId);
   }else{ sel=null; renderList(); }
   draw();
@@ -637,6 +638,7 @@ cv.addEventListener('pointermove',e=>{
     return;
   }
   const m=drag.m, o=drag.o;
+  if(Math.hypot(x-drag.sx, y-drag.sy)>4) drag.moved=true;
   const ndx=(x-drag.sx)/view.w, ndy=(y-drag.sy)/view.h;
   const C=v=>clamp(v,0.004,0.996);
   if(drag.mode==='move'){
@@ -654,7 +656,49 @@ cv.addEventListener('pointermove',e=>{
   snapGuides(m, drag.mode);
   draw();
 });
-window.addEventListener('pointerup',()=>{ if(drag){ drag=null; guides.v=guides.h=false; draw(); } });
+window.addEventListener('pointerup',()=>{
+  if(!drag) return;
+  const d=drag; drag=null; guides.v=guides.h=false; draw();
+  if(d.mode==='label' && !d.moved) openInlineEdit(d.m);   // clique simples no texto → edita ali mesmo
+});
+
+/* ══════════ INLINE EDIT (clicar no valor edita na foto) ══════════ */
+let inlineEd=null;
+function openInlineEdit(m){
+  closeInlineEdit();
+  const h=m._hit && m._hit.label; if(!h) return;
+  const isText=(m.type==='text');
+  const inp=document.createElement('input');
+  inp.type=isText?'text':'number'; inp.step='any'; inp.min='0';
+  inp.value=isText?(m.text||''):(m.value||'');
+  inp.placeholder=isText?'seu texto':(m.unit||'cm');
+  const w=isText?230:120;
+  Object.assign(inp.style,{position:'absolute', left:Math.round(h.x-w/2)+'px', top:Math.round(h.y-21)+'px',
+    width:w+'px', height:'42px', background:'var(--panel)', color:'var(--text)',
+    border:'2px solid var(--accent)', borderRadius:'9px', textAlign:'center',
+    fontSize:'17px', fontWeight:'700', outline:'none', zIndex:'50', fontFamily:'Inter',
+    boxShadow:'0 6px 20px rgba(0,0,0,.5)'});
+  stage.appendChild(inp);
+  inlineEd={inp,m};
+  const commit=()=>{
+    if(!inlineEd) return;
+    if(isText) m.text=inp.value; else m.value=inp.value;
+    closeInlineEdit(); renderList(); renderStrip(); draw();
+  };
+  inp.onkeydown=e=>{
+    e.stopPropagation();
+    if(e.key==='Enter') commit();
+    if(e.key==='Escape') closeInlineEdit();
+  };
+  inp.onblur=commit;
+  inp.onpointerdown=e=>e.stopPropagation();
+  setTimeout(()=>{ inp.focus(); inp.select(); },0);
+}
+function closeInlineEdit(){
+  if(!inlineEd) return;
+  const i=inlineEd; inlineEd=null;
+  i.inp.remove();
+}
 
 /* Instagram-style center snapping: stick to the photo center and show guide lines */
 function snapGuides(m, mode){
