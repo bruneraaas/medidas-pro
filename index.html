@@ -135,7 +135,7 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v1.8</div>
+        <div class="sub">Fotos com medidas para eBay · v1.9</div>
       </div>
     </div>
 
@@ -220,6 +220,7 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
     <button class="btn btn-accent wide" id="genDescBtn" disabled>✨ Gerar descrição</button>
     <div class="ai-out" id="aiOut" style="display:none"></div>
     <button class="btn btn-ghost wide" id="copyDescBtn" style="display:none">📋 Copiar descrição</button>
+    <button class="btn btn-ghost wide" id="testKeyBtn" style="font-size:12px;padding:8px">🔍 Testar minha chave</button>
   </aside>
 
   <main>
@@ -849,7 +850,9 @@ async function listGemModels(key){
   return gemCache.list;
 }
 // preference order: newest/cheapest free-tier models first
-const GEM_PREFS=['gemini-3-flash','gemini-flash-latest','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.0-flash'];
+const GEM_PREFS=['gemini-flash-lite-latest','gemini-2.5-flash-lite','gemini-flash-latest','gemini-2.5-flash','gemini-3-flash','gemini-2.0-flash-lite','gemini-2.0-flash'];
+// modelos que a chave rejeitou por não ter cota (limit: 0) — não tenta de novo nesta sessão
+const noQuota=new Set();
 function pickGemModels(avail){
   const picked=[];
   for(const pref of GEM_PREFS){
@@ -857,13 +860,15 @@ function pickGemModels(avail){
     if(m) picked.push(m);
   }
   if(!picked.length) picked.push(...avail.filter(a=>a.includes('flash')).slice(0,4));
-  return picked.length? picked : ['gemini-2.5-flash-lite','gemini-2.5-flash'];
+  if(!picked.length) picked.push('gemini-2.5-flash-lite','gemini-2.5-flash');
+  return picked.filter(m=>!noQuota.has(m));
 }
 
 async function callAI(prompt, imgB64, onStatus){
   const key=$('gemKey').value.trim();
   const models=pickGemModels(await listGemModels(key));
-  let lastErr='';
+  if(!models.length) throw new Error('NO_MODELS');
+  const fails=[];   // {model, msg} de cada modelo tentado
   for(const model of models){
     for(let attempt=0; attempt<2; attempt++){
       try{
@@ -877,32 +882,49 @@ async function callAI(prompt, imgB64, onStatus){
         });
         const data=await res.json();
         const txt=data?.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('');
-        if(txt && txt.trim()) return txt;
+        if(txt && txt.trim()){ lastModel=model; return txt; }
         const msg=data?.error?.message||('HTTP '+res.status);
-        lastErr=model+': '+msg;
-        if(res.status===429 && attempt===0 && !/limit:\s*0/.test(msg)){
+        const zeroQuota=/limit:\s*0/.test(msg);
+        if(zeroQuota) noQuota.add(model);   // esse modelo não serve para esta chave
+        fails.push({model, msg, zeroQuota, status:res.status});
+        if(res.status===429 && attempt===0 && !zeroQuota){
           // rate-limit momentâneo: espera o tempo sugerido e tenta 1x de novo
           const m=msg.match(/retry in ([\d.]+)s/i);
-          const wait=Math.min((m? parseFloat(m[1]):8)+1, 25);
-          if(onStatus) onStatus(`Limite de velocidade — aguardando ${Math.ceil(wait)}s para tentar de novo…`);
-          await new Promise(r=>setTimeout(r, wait*1000));
+          const wait=Math.min((m? parseFloat(m[1]):8)+1.5, 30);
+          for(let s=Math.ceil(wait); s>0; s--){
+            if(onStatus) onStatus(`Limite de velocidade do ${model} — tentando de novo em ${s}s…`);
+            await new Promise(r=>setTimeout(r,1000));
+          }
           continue;
         }
         break; // sem cota neste modelo → tenta o próximo
-      }catch(e){ lastErr=e.message; break; }
+      }catch(e){ fails.push({model, msg:e.message}); break; }
     }
   }
-  throw new Error(lastErr||'sem resposta');
+  const err=new Error('ALL_FAILED'); err.fails=fails; throw err;
 }
+let lastModel='';
 
-function friendlyAIError(msg){
-  if(/API key not valid|API_KEY_INVALID/i.test(msg))
+function friendlyAIError(e){
+  const fails=e.fails||[];
+  const all=fails.map(f=>f.msg).join(' ');
+  if(e.message==='NO_MODELS')
+    return 'Nenhum modelo disponível para esta chave. Crie uma chave nova em aistudio.google.com/apikey.';
+  if(/API key not valid|API_KEY_INVALID/i.test(all) || /API key not valid/i.test(e.message))
     return 'Chave inválida — confira se copiou a chave completa do aistudio.google.com/apikey.';
-  if(/limit:\s*0/.test(msg))
-    return 'Sua chave não tem cota gratuita para os modelos disponíveis. Crie uma chave nova em aistudio.google.com/apikey (botão "Create API key", escolhendo criar um projeto novo) e cole aqui.\n\nDetalhe técnico: '+msg;
-  if(/quota|429|RESOURCE_EXHAUSTED/i.test(msg))
-    return 'Limite gratuito atingido neste minuto. Aguarde ~1 minuto e clique de novo.\n\nDetalhe técnico: '+msg;
-  return msg;
+
+  const detail=fails.length
+    ? '\n\nO que cada modelo respondeu:\n'+fails.map(f=>'• '+f.model+': '+(f.zeroQuota?'sem cota gratuita (limit: 0)':f.msg.split('\n')[0].slice(0,110))).join('\n')
+    : '\n\nDetalhe: '+e.message;
+
+  const rateLimited=fails.some(f=>f.status===429 && !f.zeroQuota);
+  if(rateLimited)
+    return 'Limite de velocidade do plano gratuito. Aguarde 1 minuto e clique em Gerar de novo — costuma funcionar na segunda tentativa.'+detail;
+
+  if(fails.length && fails.every(f=>f.zeroQuota))
+    return 'Nenhum dos modelos tem cota gratuita nesta chave. Isso acontece quando a chave foi criada num projeto do Google Cloud sem o nível gratuito.\n\nSolução: em aistudio.google.com/apikey clique em "Create API key" e escolha "Create API key in new project" — cole a chave nova aqui.'+detail;
+
+  return 'Não consegui gerar a descrição.'+detail;
 }
 
 $('genDescBtn').onclick=async()=>{
@@ -924,9 +946,49 @@ $('genDescBtn').onclick=async()=>{
     cp.style.display='inline-flex';
   }catch(e){
     out.classList.remove('loading');
-    out.textContent='⚠ '+friendlyAIError(e.message);
+    out.textContent='⚠ '+friendlyAIError(e);
   }
   btn.disabled=false; btn.textContent='✨ Gerar descrição';
+};
+
+$('testKeyBtn').onclick=async()=>{
+  const key=$('gemKey').value.trim(), out=$('aiOut'), btn=$('testKeyBtn');
+  if(!key){ $('gemKey').focus(); toast('Cole a chave primeiro'); return; }
+  btn.disabled=true; btn.textContent='Testando…';
+  out.style.display='block'; out.classList.add('loading'); out.textContent='Consultando os modelos da sua chave…';
+  const lines=[];
+  try{
+    gemCache={key:'', list:null}; noQuota.clear();
+    const avail=await listGemModels(key);
+    if(!avail.length){ lines.push('❌ A chave não retornou nenhum modelo — provavelmente é inválida.'); }
+    else{
+      const cands=pickGemModels(avail);
+      lines.push('Modelos que o app vai tentar, na ordem:');
+      lines.push(cands.map((m,i)=>`  ${i+1}. ${m}`).join('\n'));
+      lines.push('\nTeste rápido (texto, sem foto):');
+      for(const m of cands.slice(0,4)){
+        out.textContent=lines.join('\n')+`\n  testando ${m}…`;
+        try{
+          const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`,{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({contents:[{parts:[{text:'diga ok'}]}]})
+          });
+          const d=await r.json();
+          if(d?.candidates?.[0]) lines.push(`  ✅ ${m} — FUNCIONA`);
+          else{
+            const msg=d?.error?.message||('HTTP '+r.status);
+            lines.push(`  ❌ ${m} — ${/limit:\s*0/.test(msg)?'sem cota gratuita':msg.split('.')[0].slice(0,70)}`);
+          }
+        }catch(err){ lines.push(`  ❌ ${m} — ${err.message}`); }
+      }
+      const ok=lines.filter(l=>l.includes('FUNCIONA')).length;
+      lines.push(ok? `\n✅ ${ok} modelo(s) funcionando — pode gerar descrições normalmente.`
+                   : '\n❌ Nenhum modelo com cota gratuita nesta chave.\nCrie outra em aistudio.google.com/apikey usando "Create API key in new project".');
+    }
+  }catch(e){ lines.push('Erro: '+e.message); }
+  out.classList.remove('loading');
+  out.textContent=lines.join('\n');
+  btn.disabled=false; btn.textContent='🔍 Testar minha chave';
 };
 
 $('copyDescBtn').onclick=async()=>{
