@@ -114,6 +114,71 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
 .ai-out{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:12.5px;line-height:1.6;white-space:pre-wrap;margin-bottom:8px;user-select:text;max-height:340px;overflow-y:auto;color:var(--text)}
 .ai-out.loading{color:var(--text2);font-style:italic}
 
+/* auth chip + topbar buttons */
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer}
+.chip b{color:var(--text)}
+.chip.on{border-color:var(--accent-dim)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3)}
+.dot.ok{background:var(--accent)}
+.dot.sync{background:#22c9ff;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:20px}
+.badge.draft{background:#2a2416;color:#e0b84a}
+.badge.ready{background:#16261a;color:var(--accent)}
+.badge.done{background:#16202a;color:#5aa9e6}
+
+/* section title with a saved product/listing bar */
+.listbar{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:14px}
+.listbar .st{display:flex;gap:6px;margin-top:9px}
+.listbar .st button{flex:1;padding:6px 4px;font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer}
+.listbar .st button.sel{border-color:transparent}
+.listbar .st button.sel[data-s=draft]{background:#2a2416;color:#e0b84a}
+.listbar .st button.sel[data-s=ready]{background:#16261a;color:var(--accent)}
+.listbar .st button.sel[data-s=done]{background:#16202a;color:#5aa9e6}
+
+/* calculator */
+.calc .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;font-size:12.5px}
+.calc .row label{color:var(--text2);flex:1}
+.calc .row input{width:88px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px;padding:6px 8px;outline:none;text-align:right;font-family:'Inter'}
+.calc .row input:focus{border-color:var(--accent)}
+.calc .res{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-top:1px solid var(--border);margin-top:4px}
+.calc .res b{font-family:'Saira Condensed';font-size:16px}
+.calc .big{font-size:15px}
+.calc .big b{color:var(--accent);font-size:20px}
+.calc .warn b{color:#ff6b6b}
+details.sec{margin-bottom:8px}
+details.sec>summary{list-style:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin:18px 0 8px;display:flex;align-items:center;gap:6px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:'▸';font-size:11px;transition:transform .15s}
+details.sec[open]>summary::before{transform:rotate(90deg)}
+.pricePill{font-family:'Saira Condensed';color:var(--accent);font-size:13px;margin-left:auto;text-transform:none;letter-spacing:0}
+
+/* overlays (login + listings) */
+.ov{position:fixed;inset:0;background:rgba(8,9,11,.82);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.ov.open{display:flex}
+.ov-card{background:var(--panel);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:400px;padding:26px 24px;max-height:88vh;overflow-y:auto}
+.ov-card.wide{max-width:920px}
+.ov-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ov-h .t{font-size:19px;font-weight:700}
+.ov-x{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:0 4px}
+.ov-x:hover{color:var(--text)}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tabs button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-weight:600;font-size:13px;cursor:pointer}
+.tabs button.on{background:var(--accent);color:#0e0f12;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.lcard{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s;position:relative}
+.lcard:hover{border-color:var(--border2)}
+.lcard .ln{font-weight:600;font-size:14px;margin-bottom:8px;padding-right:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lcard .lm{font-size:12px;color:var(--text3);line-height:1.7}
+.lcard .lx{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;opacity:0}
+.lcard:hover .lx{opacity:1}
+.lcard .lx:hover{color:#ff6b6b}
+.lcard .lact{display:flex;gap:6px;margin-top:10px}
+.lcard .lact button{flex:1;padding:6px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-weight:600}
+.empty{grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.err{background:#2a1616;border:1px solid #5a2020;color:#ff9b9b;border-radius:8px;padding:9px 11px;font-size:12.5px;margin-bottom:12px;display:none}
+.err.show{display:block}
+
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--accent);color:#0e0f12;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
@@ -135,7 +200,16 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v1.9</div>
+        <div class="sub">Fotos com medidas para eBay · v2.0</div>
+      </div>
+    </div>
+
+    <div class="listbar">
+      <input type="text" class="tin" id="listTitle" style="margin-bottom:0" placeholder="Título do anúncio (ex: Suporte F1 3D)"/>
+      <div class="st" id="statusRow">
+        <button data-s="draft" class="sel">Rascunho</button>
+        <button data-s="ready">Pronto</button>
+        <button data-s="done">Publicado</button>
       </div>
     </div>
 
@@ -201,6 +275,24 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <label class="toggle"><input type="checkbox" id="squarePad"/><span class="tk"></span></label>
     </div>
 
+    <details class="sec" id="priceSec">
+      <summary>Preço (calculadora) <span class="pricePill" id="pricePill"></span></summary>
+      <div class="calc">
+        <div class="row"><label>Filamento (£/kg)</label><input type="number" id="cKg" value="10.5" step="0.1" min="0"/></div>
+        <div class="row"><label>Gramas usadas</label><input type="number" id="cGrams" placeholder="0" step="1" min="0"/></div>
+        <div class="row"><label>Tempo (horas)</label><input type="number" id="cHours" placeholder="0" step="0.5" min="0"/></div>
+        <div class="row"><label>Embalagem (£)</label><input type="number" id="cPack" placeholder="0" step="0.01" min="0"/></div>
+        <div class="row"><label>Frete (£)</label><input type="number" id="cShip" placeholder="0" step="0.01" min="0"/></div>
+        <div class="row"><label>Margem de lucro (%)</label><input type="number" id="cMargin" value="30" step="1" min="0"/></div>
+        <div class="row"><label>Taxa Ad eBay (%)</label><input type="number" id="cAd" value="10" step="0.1" min="0"/></div>
+        <div class="res"><span>Custo total</span><b id="rCost">£0.00</b></div>
+        <div class="res big"><span>Anunciar por</span><b id="rListed">£0.00</b></div>
+        <div class="res"><span style="color:var(--text3)">Comprador vê</span><b id="rBuyer" style="color:var(--text2)">£0.00</b></div>
+        <div class="res" id="rProfitRow"><span>Lucro líquido</span><b id="rProfit">£0.00</b></div>
+        <div style="font-size:10.5px;color:var(--text3);margin-top:6px;line-height:1.5">Bristol · 24.67p/kWh · Bambu A1 95W · Buyer Protection £0.10+7% · VAT 20% sobre Ad</div>
+      </div>
+    </details>
+
     <div class="slabel">Exportar</div>
     <button class="btn btn-accent wide" id="dlBtn" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -228,6 +320,9 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <span id="photoName" style="font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
       <span class="spacer"></span>
       <button class="btn btn-ghost" id="redetectBtn" style="padding:8px 14px;display:none">↻ Reposicionar setas</button>
+      <button class="btn btn-accent" id="saveListBtn" style="padding:8px 14px">💾 Salvar anúncio</button>
+      <button class="btn btn-ghost" id="openListsBtn" style="padding:8px 14px">📚 Anúncios</button>
+      <button class="chip" id="authChip"><span class="dot" id="authDot"></span><span id="authTxt">Entrar</span></button>
     </div>
     <div id="stage">
       <canvas id="cv"></canvas>
@@ -239,6 +334,43 @@ input[type=color].sw::-webkit-color-swatch{border:none;border-radius:50%}
       <div id="hint" style="opacity:0">Arraste as setas e os textos · clique no valor para digitar direto na foto</div>
     </div>
   </main>
+</div>
+
+<!-- LOGIN / REGISTRO -->
+<div class="ov" id="authOv">
+  <div class="ov-card">
+    <div class="ov-h"><span class="t" id="authTitle">Entrar</span><button class="ov-x" onclick="closeAuth()">×</button></div>
+    <div class="tabs">
+      <button id="tabLogin" class="on" onclick="authMode('login')">Entrar</button>
+      <button id="tabReg" onclick="authMode('register')">Criar conta</button>
+    </div>
+    <div class="err" id="authErr"></div>
+    <input type="text" class="tin" id="auUser" placeholder="Usuário" autocomplete="username"/>
+    <input type="password" class="tin" id="auPass" placeholder="Senha" autocomplete="current-password"/>
+    <input type="text" class="tin" id="auInvite" placeholder="Código de convite" style="display:none"/>
+    <button class="btn btn-accent wide" id="auGo" style="margin-top:6px">Entrar</button>
+    <p style="font-size:12px;color:var(--text3);margin-top:12px;line-height:1.5" id="authHelp">Entre para sincronizar seus anúncios entre computadores. Ainda não tem conta? Crie uma acima.</p>
+  </div>
+</div>
+
+<!-- BIBLIOTECA DE ANÚNCIOS -->
+<div class="ov" id="listOv">
+  <div class="ov-card wide">
+    <div class="ov-h">
+      <span class="t">Meus anúncios</span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="listSync" style="font-size:12px;color:var(--text3)"></span>
+        <button class="ov-x" onclick="closeLists()">×</button>
+      </div>
+    </div>
+    <div class="tabs" style="max-width:340px">
+      <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
+      <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
+      <button id="fReady" onclick="filterLists('ready')">Pronto</button>
+      <button id="fDone" onclick="filterLists('done')">Publicado</button>
+    </div>
+    <div class="grid" id="listGrid"></div>
+  </div>
 </div>
 
 <script>
@@ -309,8 +441,15 @@ function addPhoto(img, name, url){
   p.bbox = detectBBox(img);
   photos.push(p);
   selectPhoto(p);
-  addMeasure('width', p, true);
-  addMeasure('height', p, true);
+  if(window.pendingMs && window.pendingMs.length){
+    p.ms = window.pendingMs.map(m=>Object.assign({}, m, {id:idSeq++}));
+    window.pendingMs = null;
+    sel = p.ms[0] || null;
+    renderList();
+  } else {
+    addMeasure('width', p, true);
+    addMeasure('height', p, true);
+  }
   renderStrip();
   // focus first value input for fast workflow
   setTimeout(()=>{ const inp=document.querySelector('#mlist input[type=number]'); if(inp) inp.focus(); },60);
@@ -943,6 +1082,7 @@ $('genDescBtn').onclick=async()=>{
     const txt=await callAI(descPrompt(cur), photoBase64(cur), s=>{ out.textContent=s; });
     out.classList.remove('loading');
     out.textContent=txt.trim();
+    window.lastDescription=txt.trim();
     cp.style.display='inline-flex';
   }catch(e){
     out.classList.remove('loading');
@@ -1027,6 +1167,170 @@ $('demoBtn').onclick=()=>{
   };
   img.src=c.toDataURL('image/jpeg',0.9);
 };
+
+/* ══════════════════════════════════════════════════
+   ANÚNCIOS · CALCULADORA · LOGIN · SINCRONIZAÇÃO
+════════════════════════════════════════════════════ */
+const API='https://medidas-api.bruneraasuk.workers.dev';
+let auth=JSON.parse(localStorage.getItem('medidas_auth')||'null');   // {token,username}
+let L=JSON.parse(localStorage.getItem('medidas_listings')||'{}');     // id -> item
+let curListingId=null, curStatus='draft', listFilter='all', authModeVal='login';
+function saveLocal(){ localStorage.setItem('medidas_listings', JSON.stringify(L)); }
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const statusLabel=s=>({draft:'Rascunho',ready:'Pronto',done:'Publicado'}[s]||s);
+
+/* ---- CALCULADORA DE PREÇO (Bristol · Bambu A1) ---- */
+const KWH=0.2467, WATTS=95;
+const money=n=>'£'+(n||0).toFixed(2);
+function calc(){
+  const g=id=>parseFloat($(id).value)||0;
+  const kg=g('cKg'),grams=g('cGrams'),hours=g('cHours'),pack=g('cPack'),ship=g('cShip'),margin=g('cMargin'),ad=g('cAd');
+  const filament=(kg/1000)*grams, energy=(WATTS*hours/1000)*KWH;
+  const cost=filament+energy+pack+ship;
+  const listed=cost*(1+margin/100);
+  const adAmt=listed*(ad/100), vat=adAmt*0.2, bp=0.10+listed*0.07;
+  const buyer=listed+bp, profit=listed-cost-adAmt-vat;
+  $('rCost').textContent=money(cost); $('rListed').textContent=money(listed);
+  $('rBuyer').textContent=money(buyer); $('rProfit').textContent=money(profit);
+  $('rProfitRow').classList.toggle('warn', profit<0 && cost>0);
+  $('pricePill').textContent = listed>0 ? money(listed) : '';
+  return {kg,grams,hours,pack,ship,margin,ad,cost,listed,buyer,profit};
+}
+function setCalc(p){ if(!p) return;
+  $('cKg').value=p.kg??10.5; $('cGrams').value=p.grams||''; $('cHours').value=p.hours||'';
+  $('cPack').value=p.pack||''; $('cShip').value=p.ship||''; $('cMargin').value=p.margin??30; $('cAd').value=p.ad??10; calc(); }
+['cKg','cGrams','cHours','cPack','cShip','cMargin','cAd'].forEach(id=>$(id).addEventListener('input',calc));
+
+/* ---- STATUS ---- */
+function setStatus(s){ curStatus=s; document.querySelectorAll('#statusRow button').forEach(b=>b.classList.toggle('sel', b.dataset.s===s)); }
+document.querySelectorAll('#statusRow button').forEach(b=> b.onclick=()=>setStatus(b.dataset.s));
+
+/* ---- COLETAR / APLICAR ANÚNCIO ---- */
+const cleanMs=ms=>(ms||[]).map(m=>({id:m.id,type:m.type,value:m.value,unit:m.unit,x1:m.x1,y1:m.y1,x2:m.x2,y2:m.y2,lx:m.lx,ly:m.ly,text:m.text,scale:m.scale}));
+const descText=()=> $('copyDescBtn').style.display!=='none' ? $('aiOut').textContent : (window.lastDescription||'');
+function reflectStyle(){ $('fmtSel').value=style.format; $('fontSel').value=style.font; $('fsize').value=style.fsize; $('thick').value=style.thick; $('halo').checked=style.halo; $('squarePad').checked=style.squarePad; markSwatch(); }
+function collectListing(){
+  const title=$('listTitle').value.trim();
+  const prev=L[curListingId]&&L[curListingId].data||{};
+  return { id:curListingId, kind:'listing', name:title||(cur&&cur.name)||'Sem título',
+    status:curStatus, deleted:false, updated_at:Date.now(),
+    data:{ title, measures: cur?cleanMs(cur.ms):(prev.measures||[]),
+      style:Object.assign({},style), descInfo:$('descInfo').value,
+      description:descText(), price:calc() } };
+}
+function applyListing(it){
+  curListingId=it.id; const d=it.data||{};
+  $('listTitle').value=d.title||it.name||''; setStatus(it.status||'draft');
+  if(d.price) setCalc(d.price); else calc();
+  $('descInfo').value=d.descInfo||'';
+  if(d.description){ window.lastDescription=d.description; $('aiOut').style.display='block'; $('aiOut').classList.remove('loading'); $('aiOut').textContent=d.description; $('copyDescBtn').style.display='block'; }
+  else { window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; }
+  if(d.style){ Object.assign(style,d.style); saveStyle(); reflectStyle(); }
+  const ms=cleanMs(d.measures);
+  if(cur){ cur.ms=ms.map(m=>Object.assign({},m)); sel=cur.ms[0]||null; renderList(); draw(); }
+  else { window.pendingMs=ms; }
+  toast('Anúncio carregado'+(cur||!ms.length?'':' — adicione a foto para ver as medidas'));
+}
+
+/* ---- SALVAR / NOVO / CARREGAR / EXCLUIR ---- */
+async function saveListing(){
+  if(!$('listTitle').value.trim() && !cur){ toast('Dê um título ao anúncio'); $('listTitle').focus(); return; }
+  if(!curListingId) curListingId=uid();
+  const item=collectListing(); item._dirty=true; L[item.id]=item; saveLocal();
+  if(auth){ const ok=await pushItem(item); if(ok){ item._dirty=false; saveLocal(); }
+    toast(ok?'✓ Salvo e sincronizado':'Salvo — sincroniza quando reconectar'); }
+  else toast('Salvo neste computador · entre para sincronizar');
+}
+function newListing(){ curListingId=null; $('listTitle').value=''; setStatus('draft');
+  window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none';
+  closeLists(); $('listTitle').focus(); toast('Novo anúncio — preencha e salve'); }
+function loadListing(id){ if(L[id]){ applyListing(L[id]); closeLists(); } }
+async function delListing(id){
+  if(!L[id]) return;
+  if(!confirm('Excluir "'+(L[id].name||'anúncio')+'"?')) return;
+  L[id].deleted=true; L[id].updated_at=Date.now(); L[id]._dirty=true; saveLocal();
+  if(auth){ const ok=await pushItem(L[id]); if(ok){ L[id]._dirty=false; saveLocal(); } }
+  if(curListingId===id) newListing();
+  renderLists(); toast('Anúncio excluído');
+}
+$('saveListBtn').onclick=saveListing;
+
+/* ---- BIBLIOTECA (overlay) ---- */
+$('openListsBtn').onclick=async()=>{ openLists(); if(auth) await syncAll(); };
+function openLists(){ $('listOv').classList.add('open'); renderLists(); }
+function closeLists(){ $('listOv').classList.remove('open'); }
+function filterLists(f){ listFilter=f;
+  [['fAll','all'],['fDraft','draft'],['fReady','ready'],['fDone','done']].forEach(([bId,v])=>$(bId).classList.toggle('on', v===f));
+  renderLists(); }
+function renderLists(){
+  const items=Object.values(L).filter(x=>!x.deleted).sort((a,b)=>b.updated_at-a.updated_at);
+  const shown=items.filter(x=> listFilter==='all'||x.status===listFilter);
+  let html='<div class="lcard" onclick="newListing()" style="display:flex;align-items:center;justify-content:center;min-height:118px;border-style:dashed"><div style="text-align:center;color:var(--accent);font-weight:600"><div style="font-size:26px;line-height:1">＋</div>Novo anúncio</div></div>';
+  html+=shown.map(x=>{ const d=x.data||{};
+    const price=d.price&&d.price.listed>0?money(d.price.listed):'—';
+    const nm=(d.measures||[]).filter(m=>m.type!=='text'&&parseFloat(m.value)).length;
+    return `<div class="lcard" onclick="loadListing('${x.id}')">
+      <button class="lx" onclick="event.stopPropagation();delListing('${x.id}')">🗑</button>
+      <div class="ln">${esc(x.name)}</div>
+      <span class="badge ${x.status}">${statusLabel(x.status)}</span>
+      <div class="lm">${nm} medida(s) · ${price}<br>${d.description?'✓ com descrição':'sem descrição'}${x.updated_by?' · '+esc(x.updated_by):''}</div>
+    </div>`; }).join('');
+  if(!shown.length) html+='<div class="empty">Nenhum anúncio '+(listFilter==='all'?'ainda':'neste status')+'.</div>';
+  $('listGrid').innerHTML=html;
+}
+
+/* ---- LOGIN / REGISTRO ---- */
+function updateAuthUI(){
+  if(auth){ $('authDot').className='dot ok'; $('authTxt').innerHTML='<b>'+esc(auth.username)+'</b>'; $('authChip').classList.add('on'); }
+  else { $('authDot').className='dot'; $('authTxt').textContent='Entrar'; $('authChip').classList.remove('on'); }
+}
+$('authChip').onclick=()=>{ if(auth){ if(confirm('Sair da conta "'+auth.username+'"?')){ auth=null; localStorage.removeItem('medidas_auth'); updateAuthUI(); toast('Você saiu'); } } else openAuth(); };
+function openAuth(){ $('authOv').classList.add('open'); authMode('login'); setTimeout(()=>$('auUser').focus(),50); }
+function closeAuth(){ $('authOv').classList.remove('open'); $('authErr').classList.remove('show'); }
+function authMode(m){ authModeVal=m;
+  $('tabLogin').classList.toggle('on',m==='login'); $('tabReg').classList.toggle('on',m==='register');
+  $('auInvite').style.display=m==='register'?'block':'none';
+  $('auGo').textContent=m==='register'?'Criar conta':'Entrar';
+  $('authTitle').textContent=m==='register'?'Criar conta':'Entrar';
+  $('authHelp').textContent=m==='register'?'Peça o código de convite ao Bruno para criar sua conta. A senha fica só com você.':'Entre para sincronizar seus anúncios entre computadores.'; }
+async function doAuth(){
+  const u=$('auUser').value.trim(), p=$('auPass').value, err=$('authErr');
+  if(!u||!p){ err.textContent='Preencha usuário e senha.'; err.classList.add('show'); return; }
+  $('auGo').disabled=true; $('auGo').textContent='...';
+  try{
+    const body={username:u,password:p}; if(authModeVal==='register') body.invite=$('auInvite').value.trim();
+    const r=await fetch(API+'/api/'+authModeVal,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok){ err.textContent=j.error||'Erro ao entrar.'; err.classList.add('show'); }
+    else { auth={token:j.token,username:j.username}; localStorage.setItem('medidas_auth',JSON.stringify(auth));
+      updateAuthUI(); closeAuth(); toast('Bem-vindo, '+j.username+'!'); await syncAll(); }
+  }catch(e){ err.textContent='Falha de conexão com o servidor.'; err.classList.add('show'); }
+  $('auGo').disabled=false; authMode(authModeVal);
+}
+$('auGo').onclick=doAuth;
+['auUser','auPass','auInvite'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doAuth(); }));
+[$('authOv'),$('listOv')].forEach(ov=>ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); }));
+
+/* ---- SINCRONIZAÇÃO ---- */
+async function api(path,opts={}){ opts.headers=Object.assign({'Content-Type':'application/json'},opts.headers||{});
+  if(auth) opts.headers.Authorization='Bearer '+auth.token; return fetch(API+path,opts); }
+function handleExpired(){ auth=null; localStorage.removeItem('medidas_auth'); updateAuthUI(); toast('Sessão expirada — entre novamente'); }
+async function pushItem(item){ try{
+  const r=await api('/api/items',{method:'PUT',body:JSON.stringify({id:item.id,kind:item.kind,name:item.name,status:item.status,deleted:!!item.deleted,data:item.data})});
+  if(r.status===401){ handleExpired(); return false; } return r.ok; }catch{ return false; } }
+async function pullServer(){ if(!auth) return; try{
+  const r=await api('/api/items'); if(r.status===401){ handleExpired(); return; }
+  const j=await r.json();
+  (j.items||[]).forEach(srv=>{ const loc=L[srv.id]; if(!loc || srv.updated_at>=loc.updated_at){ L[srv.id]=srv; } });
+  saveLocal(); }catch{} }
+async function pushDirty(){ if(!auth) return; for(const id in L){ if(L[id]._dirty){ const ok=await pushItem(L[id]); if(ok){ L[id]._dirty=false; } } } saveLocal(); }
+function setSync(t){ $('listSync').textContent=t||''; }
+async function syncAll(){ if(!auth) return; setSync('sincronizando…'); await pushDirty(); await pullServer(); setSync('✓ sincronizado'); renderLists(); setTimeout(()=>setSync(''),2500); }
+
+/* ---- INIT ---- */
+setStatus('draft'); calc(); updateAuthUI();
+if(auth) syncAll();
 
 /* redraw once fonts are ready so canvas text uses the condensed font */
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>draw());
