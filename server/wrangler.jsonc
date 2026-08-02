@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "medidas-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "medidas-db",
+      "database_id": "b0c319ca-f5bd-4491-8bc0-5a5ca5ca1770"
+    }
+  ]
+}
