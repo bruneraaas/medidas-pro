@@ -255,7 +255,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v2.2</div>
+        <div class="sub">Fotos com medidas para eBay · v2.3</div>
       </div>
     </div>
 
@@ -353,8 +353,6 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Baixar esta foto
     </button>
-    <button class="btn btn-ghost wide" id="dlAllBtn" disabled>Baixar todas as fotos</button>
-    <button class="btn btn-ghost wide" id="demoBtn">Ver com foto de exemplo</button>
 
     <div class="slabel">Descrição para eBay (IA grátis)</div>
     <div style="display:flex;gap:7px;margin-bottom:6px">
@@ -561,7 +559,6 @@ function selectPhoto(p){
   $('emptyState').style.display = p? 'none':'flex';
   $('redetectBtn').style.display = p? 'inline-flex':'none';
   $('dlBtn').disabled = !p;
-  $('dlAllBtn').disabled = photos.length===0;
   $('genDescBtn').disabled = !p;
   renderStrip(); renderList(); draw();
 }
@@ -985,17 +982,6 @@ $('dlBtn').onclick=async()=>{
   downloadBlob(b, cur.name+'-medidas.jpg');
   toast('Foto salva!');
 };
-$('dlAllBtn').onclick=async()=>{
-  const ready=photos.filter(hasContent);
-  if(!ready.length){ toast('Nenhuma foto com medidas preenchidas'); return; }
-  for(const p of ready){
-    const b=await exportPhoto(p);
-    await downloadBlob(b, p.name+'-medidas.jpg');
-    await new Promise(r=>setTimeout(r,400));
-  }
-  toast(ready.length+' foto(s) salvas!');
-};
-
 /* ══════════ AI DESCRIPTION (Google Gemini — free tier) ══════════ */
 function saveKey(announce){
   localStorage.setItem('medidas_gemkey', $('gemKey').value.trim());
@@ -1230,7 +1216,7 @@ $('copyDescBtn').onclick=async()=>{
 };
 
 /* ══════════ DEMO IMAGE ══════════ */
-$('demoBtn').onclick=()=>{
+window.loadDemo=()=>{
   const c=document.createElement('canvas'); c.width=1400; c.height=1050;
   const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,0,1050);
