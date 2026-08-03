@@ -320,7 +320,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.1</div>
+        <div class="sub">Fotos com medidas para eBay · v3.2</div>
       </div>
     </div>
 
@@ -425,24 +425,14 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       </div>
     </details>
 
-    <div class="slabel">Exportar</div>
-    <button class="btn btn-accent wide" id="dlBtn" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Baixar esta foto
-    </button>
-
-    <div class="slabel">Descrição para eBay (IA grátis)</div>
-    <div style="display:flex;gap:7px;margin-bottom:6px">
-      <input type="password" class="tin" id="gemKey" style="flex:1;margin-bottom:0" placeholder="Chave do Google AI Studio — cole aqui"/>
-      <button class="btn btn-accent" id="saveKeyBtn" style="padding:9px 14px;flex-shrink:0">Salvar</button>
-    </div>
-    <div id="keyStatus" style="font-size:11px;color:var(--accent);margin:0 0 6px;display:none">✓ Chave salva neste navegador</div>
-    <div style="font-size:11px;color:var(--text3);margin:0 0 9px;line-height:1.5">Grátis, sem cartão: crie em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a>.</div>
+    <div class="slabel">Descrição para eBay (IA)</div>
     <input type="text" class="tin" id="descInfo" placeholder="Nome/detalhes do item (opcional) — ex: Star Wars sign"/>
     <button class="btn btn-accent wide" id="genDescBtn" disabled>✨ Gerar descrição</button>
     <div class="ai-out" id="aiOut" style="display:none"></div>
     <button class="btn btn-ghost wide" id="copyDescBtn" style="display:none">📋 Copiar descrição</button>
-    <button class="btn btn-ghost wide" id="testKeyBtn" style="font-size:12px;padding:8px">🔍 Testar minha chave</button>
+
+    <div class="slabel" style="margin-top:22px">Salvar</div>
+    <button class="btn btn-accent wide" id="saveListBtn" style="padding:14px;font-size:15px">💾 Salvar anúncio</button>
   </aside>
 
   <main>
@@ -451,10 +441,10 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <a id="srcChip" class="srcchip" href="#" target="_blank" style="display:none"></a>
       <span class="spacer"></span>
       <button class="btn btn-ghost" id="redetectBtn" style="padding:8px 14px;display:none">↻ Reposicionar setas</button>
-      <button class="btn btn-accent" id="saveListBtn" style="padding:8px 14px">💾 Salvar anúncio</button>
       <button class="btn btn-ghost" id="openPubBtn" style="padding:8px 14px;display:none">🛒 Publicar</button>
       <button class="btn btn-ghost" id="openFilaBtn" style="padding:8px 14px">📋 Fila</button>
       <button class="btn btn-ghost" id="openListsBtn" style="padding:8px 14px">📚 Anúncios</button>
+      <button class="btn btn-ghost" id="settingsBtn" style="padding:8px 12px;font-size:16px" title="Configurações (chave da IA)">⚙️</button>
       <button class="chip" id="authChip"><span class="dot" id="authDot"></span><span id="authTxt">Entrar</span></button>
     </div>
     <div id="stage">
@@ -585,6 +575,22 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
   </div>
 </div>
 
+<!-- CONFIGURAÇÕES (chave da IA) -->
+<div class="ov" id="settingsOv">
+  <div class="ov-card">
+    <div class="ov-h"><span class="t">⚙️ Configurações</span><button class="ov-x" onclick="closeSettings()">×</button></div>
+    <div class="slabel" style="margin-top:0;margin-bottom:8px">Chave da IA (Google Gemini)</div>
+    <div style="display:flex;gap:7px;margin-bottom:6px">
+      <input type="password" class="tin" id="gemKey" style="flex:1;margin-bottom:0" placeholder="Chave do Google AI Studio — cole aqui"/>
+      <button class="btn btn-accent" id="saveKeyBtn" style="padding:9px 14px;flex-shrink:0">Salvar</button>
+    </div>
+    <div id="keyStatus" style="font-size:11px;color:var(--accent);margin:0 0 8px;display:none">✓ Chave salva neste navegador</div>
+    <div style="font-size:12px;color:var(--text3);margin:0 0 14px;line-height:1.5">Grátis, sem cartão. Crie em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a>. A chave é usada para gerar as descrições dos anúncios e fica salva só no seu navegador.</div>
+    <button class="btn btn-ghost wide" id="testKeyBtn" style="font-size:13px">🔍 Testar minha chave</button>
+    <div class="ai-out" id="settingsOut" style="display:none;margin-top:10px;font-size:11.5px;max-height:280px"></div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lb" id="lb" onclick="if(event.target.id==='lb')closeLB()">
   <div class="lbtop">
@@ -694,7 +700,6 @@ function selectPhoto(p){
   $('photoName').textContent = p? p.name+'  ·  '+p.img.naturalWidth+'×'+p.img.naturalHeight+'px' : '';
   $('emptyState').style.display = p? 'none':'flex';
   $('redetectBtn').style.display = p? 'inline-flex':'none';
-  $('dlBtn').disabled = !p;
   $('genDescBtn').disabled = !p;
   renderStrip(); renderList(); draw();
 }
@@ -1118,13 +1123,6 @@ async function downloadBlob(blob,name){
   a.href=URL.createObjectURL(blob); a.download=name; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
-$('dlBtn').onclick=async()=>{
-  if(!cur) return;
-  if(!hasContent(cur)){ toast('Preencha pelo menos uma medida!'); return; }
-  const b=await exportPhoto(cur);
-  downloadBlob(b, cur.name+'-medidas.jpg');
-  toast('Foto salva!');
-};
 /* ══════════ AI DESCRIPTION (Google Gemini — free tier) ══════════ */
 function saveKey(announce){
   localStorage.setItem('medidas_gemkey', $('gemKey').value.trim());
@@ -1290,9 +1288,9 @@ function friendlyAIError(e){
 $('genDescBtn').onclick=async()=>{
   if(!cur) return;
   if(!$('gemKey').value.trim()){
-    const out=$('aiOut'); out.style.display='block'; out.classList.remove('loading');
-    out.textContent='⚠ Cole sua chave gratuita do Google AI Studio no campo acima.\n\n1. Acesse aistudio.google.com/apikey\n2. Entre com sua conta Google\n3. Clique em "Create API key" e copie\n4. Cole no campo acima — fica salva para as próximas vezes';
-    $('gemKey').focus(); return;
+    toast('Cole sua chave do Google AI Studio em ⚙️ Configurações');
+    $('settingsBtn').click();
+    return;
   }
   const btn=$('genDescBtn'), out=$('aiOut'), cp=$('copyDescBtn');
   btn.disabled=true; btn.textContent='Gerando…';
@@ -1312,8 +1310,12 @@ $('genDescBtn').onclick=async()=>{
   btn.disabled=false; btn.textContent='✨ Gerar descrição';
 };
 
+$('settingsBtn').onclick=()=>{ $('settingsOv').classList.add('open'); setTimeout(()=>$('gemKey').focus(),50); };
+window.closeSettings=()=>$('settingsOv').classList.remove('open');
+$('settingsOv').addEventListener('click',e=>{ if(e.target===$('settingsOv')) closeSettings(); });
+
 $('testKeyBtn').onclick=async()=>{
-  const key=$('gemKey').value.trim(), out=$('aiOut'), btn=$('testKeyBtn');
+  const key=$('gemKey').value.trim(), out=$('settingsOut'), btn=$('testKeyBtn');
   if(!key){ $('gemKey').focus(); toast('Cole a chave primeiro'); return; }
   btn.disabled=true; btn.textContent='Testando…';
   out.style.display='block'; out.classList.add('loading'); out.textContent='Consultando os modelos da sua chave…';
