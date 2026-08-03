@@ -179,6 +179,59 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
 .err{background:#2a1616;border:1px solid #5a2020;color:#ff9b9b;border-radius:8px;padding:9px 11px;font-size:12.5px;margin-bottom:12px;display:none}
 .err.show{display:block}
 
+/* FILA (tela cheia) */
+.full{position:fixed;inset:0;background:var(--bg);z-index:250;display:none;flex-direction:column}
+.full.open{display:flex}
+.full-top{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel)}
+.full-top .ft{font-size:17px;font-weight:700}
+.full-top .fsub{font-size:12px;color:var(--text3)}
+.full-body{flex:1;display:grid;grid-template-columns:250px 1fr;min-height:0}
+.fcats{background:var(--panel);border-right:1px solid var(--border);padding:14px 10px;overflow-y:auto}
+.fcats .h{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;padding-left:4px}
+.fcat{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;margin-bottom:2px}
+.fcat:hover{background:var(--panel2)}
+.fcat.on{background:var(--panel2);border:1px solid var(--border2)}
+.fcat .ic{font-size:15px;flex-shrink:0}
+.fcat .nm{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fcat .ct{font-size:11px;color:var(--text3);background:var(--bg);border-radius:20px;padding:1px 8px;font-family:'Saira Condensed';flex-shrink:0}
+.fcat .cedit{opacity:0;background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0}
+.fcat:hover .cedit{opacity:.9}
+.fcat .cedit:hover{color:var(--accent)}
+.addcat{width:100%;background:none;border:1px dashed var(--border2);color:var(--text2);border-radius:9px;padding:9px;cursor:pointer;font-size:13px;font-weight:500;margin-top:8px;font-family:inherit}
+.addcat:hover{border-color:var(--accent);color:var(--accent)}
+.fqueue{padding:18px 22px;overflow-y:auto}
+.fqh{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.fqh .qt{font-size:20px;font-weight:700}
+.fqh .qc{font-size:12px;color:var(--text3)}
+.fqh .filt{margin-left:auto;display:flex;gap:6px}
+.fqh .filt button{background:var(--panel2);border:1px solid var(--border2);color:var(--text2);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;font-weight:600;font-family:inherit}
+.fqh .filt button.on{border-color:var(--accent-dim);color:var(--accent)}
+.addbar{display:flex;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:10px;margin-bottom:16px;flex-wrap:wrap}
+.addbar input{background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:9px 11px;font-size:13px;outline:none;font-family:inherit}
+.addbar input:focus{border-color:var(--accent)}
+.addbar .lk{flex:1;min-width:200px}
+.addbar .nm{width:170px}
+.addbar button{background:var(--accent);color:#0e0f12;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.qitem{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-bottom:10px}
+.qitem.done{opacity:.55}
+.qitem .th{width:48px;height:48px;border-radius:9px;background:var(--panel2);border:1px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.qitem .info{flex:1;min-width:0}
+.qitem .nm{font-weight:600;font-size:14.5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qitem .lk{font-size:12px;color:#5aa9e6;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.qitem .lk:hover{text-decoration:underline}
+.qitem .note{font-size:12px;color:var(--text3);margin-top:3px;cursor:pointer}
+.qitem .note:hover{color:var(--text2)}
+.qitem .rt{display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0}
+.qitem .act{display:flex;gap:6px}
+.qitem .act button{border:1px solid var(--border2);background:transparent;color:var(--text2);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.qitem .act .go{background:var(--accent);color:#0e0f12;border-color:var(--accent)}
+.qitem .act .del{color:var(--text3);padding:6px 9px}
+.qitem .act .del:hover{color:#ff6b6b}
+.badge.pend{background:#2a2416;color:#e0b84a}
+.badge.doing{background:#16202a;color:#5aa9e6}
+.srcchip{display:inline-flex;align-items:center;gap:6px;background:#16202a;border:1px solid #24405a;color:#8fc3ee;border-radius:20px;padding:5px 12px;font-size:12px;text-decoration:none;max-width:320px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.srcchip:hover{border-color:#5aa9e6}
+
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--accent);color:#0e0f12;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
@@ -200,7 +253,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v2.0</div>
+        <div class="sub">Fotos com medidas para eBay · v2.1</div>
       </div>
     </div>
 
@@ -318,9 +371,11 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
   <main>
     <div id="topbar">
       <span id="photoName" style="font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <a id="srcChip" class="srcchip" href="#" target="_blank" style="display:none"></a>
       <span class="spacer"></span>
       <button class="btn btn-ghost" id="redetectBtn" style="padding:8px 14px;display:none">↻ Reposicionar setas</button>
       <button class="btn btn-accent" id="saveListBtn" style="padding:8px 14px">💾 Salvar anúncio</button>
+      <button class="btn btn-ghost" id="openFilaBtn" style="padding:8px 14px">📋 Fila</button>
       <button class="btn btn-ghost" id="openListsBtn" style="padding:8px 14px">📚 Anúncios</button>
       <button class="chip" id="authChip"><span class="dot" id="authDot"></span><span id="authTxt">Entrar</span></button>
     </div>
@@ -350,6 +405,41 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
     <input type="text" class="tin" id="auInvite" placeholder="Código de convite" style="display:none"/>
     <button class="btn btn-accent wide" id="auGo" style="margin-top:6px">Entrar</button>
     <p style="font-size:12px;color:var(--text3);margin-top:12px;line-height:1.5" id="authHelp">Entre para sincronizar seus anúncios entre computadores. Ainda não tem conta? Crie uma acima.</p>
+  </div>
+</div>
+
+<!-- FILA DE PRODUTOS -->
+<div class="full" id="filaFull">
+  <div class="full-top">
+    <div class="logo" style="width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#0e0f12;font-weight:800">📋</div>
+    <div><div class="ft">Fila de produtos</div><div class="fsub">Links para cadastrar, por categoria</div></div>
+    <span class="spacer" style="flex:1"></span>
+    <span id="filaSync" style="font-size:12px;color:var(--text3);margin-right:6px"></span>
+    <button class="btn btn-ghost" onclick="closeFila()" style="padding:8px 16px">✕ Fechar</button>
+  </div>
+  <div class="full-body">
+    <div class="fcats">
+      <div class="h">Categorias</div>
+      <div id="fcatList"></div>
+      <button class="addcat" onclick="addCategory()">＋ Nova categoria</button>
+    </div>
+    <div class="fqueue">
+      <div class="fqh">
+        <span class="qt" id="fqTitle">—</span>
+        <span class="qc" id="fqCount"></span>
+        <div class="filt">
+          <button class="on" data-qf="all" onclick="filaFilter('all',this)">Todos</button>
+          <button data-qf="todo" onclick="filaFilter('todo',this)">A fazer</button>
+          <button data-qf="done" onclick="filaFilter('done',this)">Feitos</button>
+        </div>
+      </div>
+      <div class="addbar" id="fqAddBar">
+        <input class="lk" id="fqLink" placeholder="Cole o link do produto (MakerWorld, Thingiverse...)"/>
+        <input class="nm" id="fqName" placeholder="Nome (opcional)"/>
+        <button onclick="addQueueItem()">＋ Adicionar</button>
+      </div>
+      <div id="fqItems"></div>
+    </div>
   </div>
 </div>
 
@@ -1217,7 +1307,8 @@ function collectListing(){
     status:curStatus, deleted:false, updated_at:Date.now(),
     data:{ title, measures: cur?cleanMs(cur.ms):(prev.measures||[]),
       style:Object.assign({},style), descInfo:$('descInfo').value,
-      description:descText(), price:calc() } };
+      description:descText(), price:calc(),
+      sourceLink: window.curSourceLink||prev.sourceLink||'', queueId: window.curQueueId||prev.queueId||'' } };
 }
 function applyListing(it){
   curListingId=it.id; const d=it.data||{};
@@ -1227,6 +1318,7 @@ function applyListing(it){
   if(d.description){ window.lastDescription=d.description; $('aiOut').style.display='block'; $('aiOut').classList.remove('loading'); $('aiOut').textContent=d.description; $('copyDescBtn').style.display='block'; }
   else { window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; }
   if(d.style){ Object.assign(style,d.style); saveStyle(); reflectStyle(); }
+  window.curSourceLink=d.sourceLink||''; window.curQueueId=d.queueId||''; updateSrcChip();
   const ms=cleanMs(d.measures);
   if(cur){ cur.ms=ms.map(m=>Object.assign({},m)); sel=cur.ms[0]||null; renderList(); draw(); }
   else { window.pendingMs=ms; }
@@ -1244,6 +1336,7 @@ async function saveListing(){
 }
 function newListing(){ curListingId=null; $('listTitle').value=''; setStatus('draft');
   window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none';
+  window.curSourceLink=''; window.curQueueId=''; updateSrcChip();
   closeLists(); $('listTitle').focus(); toast('Novo anúncio — preencha e salve'); }
 function loadListing(id){ if(L[id]){ applyListing(L[id]); closeLists(); } }
 async function delListing(id){
@@ -1264,7 +1357,7 @@ function filterLists(f){ listFilter=f;
   [['fAll','all'],['fDraft','draft'],['fReady','ready'],['fDone','done']].forEach(([bId,v])=>$(bId).classList.toggle('on', v===f));
   renderLists(); }
 function renderLists(){
-  const items=Object.values(L).filter(x=>!x.deleted).sort((a,b)=>b.updated_at-a.updated_at);
+  const items=Object.values(L).filter(x=>!x.deleted && x.kind==='listing').sort((a,b)=>b.updated_at-a.updated_at);
   const shown=items.filter(x=> listFilter==='all'||x.status===listFilter);
   let html='<div class="lcard" onclick="newListing()" style="display:flex;align-items:center;justify-content:center;min-height:118px;border-style:dashed"><div style="text-align:center;color:var(--accent);font-weight:600"><div style="font-size:26px;line-height:1">＋</div>Novo anúncio</div></div>';
   html+=shown.map(x=>{ const d=x.data||{};
@@ -1327,6 +1420,97 @@ async function pullServer(){ if(!auth) return; try{
 async function pushDirty(){ if(!auth) return; for(const id in L){ if(L[id]._dirty){ const ok=await pushItem(L[id]); if(ok){ L[id]._dirty=false; } } } saveLocal(); }
 function setSync(t){ $('listSync').textContent=t||''; }
 async function syncAll(){ if(!auth) return; setSync('sincronizando…'); await pushDirty(); await pullServer(); setSync('✓ sincronizado'); renderLists(); setTimeout(()=>setSync(''),2500); }
+
+/* ══════════ FILA DE PRODUTOS (categorias + links) ══════════ */
+let curCat=null, filaFilt='all';
+const catList=()=>Object.values(L).filter(x=>x.kind==='category'&&!x.deleted).sort((a,b)=>(a.data.order||0)-(b.data.order||0)||a.updated_at-b.updated_at);
+const queueOf=cid=>Object.values(L).filter(x=>x.kind==='queue'&&!x.deleted&&x.data.catId===cid);
+async function saveItem(item){ item._dirty=true; L[item.id]=item; saveLocal(); if(auth){ const ok=await pushItem(item); if(ok){ item._dirty=false; saveLocal(); } } }
+
+$('openFilaBtn').onclick=async()=>{ openFila(); if(auth){ await syncAll(); renderFila(); } };
+function openFila(){ $('filaFull').classList.add('open'); if(!curCat){ const cs=catList(); curCat=cs[0]?cs[0].id:null; } renderFila(); }
+function closeFila(){ $('filaFull').classList.remove('open'); }
+function renderFila(){ renderCats(); renderQueue(); }
+function renderCats(){
+  const cs=catList();
+  $('fcatList').innerHTML = cs.length ? cs.map(c=>`
+    <div class="fcat ${c.id===curCat?'on':''}" onclick="pickCat('${c.id}')">
+      <span class="ic">${c.data.icon||'📁'}</span><span class="nm">${esc(c.name)}</span>
+      <span class="ct">${queueOf(c.id).length}</span>
+      <button class="cedit" title="Renomear / excluir" onclick="event.stopPropagation();editCategory('${c.id}')">✏️</button>
+    </div>`).join('')
+    : '<div style="color:var(--text3);font-size:12.5px;padding:10px 6px;line-height:1.5">Crie sua primeira categoria abaixo (ex: Chaveiros, Fórmula 1...).</div>';
+}
+function renderQueue(){
+  const c=L[curCat];
+  $('fqTitle').textContent = c? c.name : '—';
+  $('fqAddBar').style.display = c? 'flex':'none';
+  if(!c){ $('fqItems').innerHTML='<div style="text-align:center;color:var(--text3);padding:50px">Selecione ou crie uma categoria à esquerda.</div>'; $('fqCount').textContent=''; return; }
+  const all=queueOf(curCat).sort((a,b)=>b.updated_at-a.updated_at);
+  $('fqCount').textContent=all.length+' produto(s)';
+  const shown=all.filter(i=> filaFilt==='all'||(filaFilt==='done'?i.status==='done':i.status!=='done'));
+  $('fqItems').innerHTML = shown.length ? shown.map(i=>{
+    const b=i.status==='done'?'<span class="badge done">Feito</span>':i.status==='doing'?'<span class="badge doing">Em andamento</span>':'<span class="badge pend">A fazer</span>';
+    const link=i.data.link||'';
+    return `<div class="qitem ${i.status==='done'?'done':''}">
+      <div class="th">${i.status==='done'?'✅':'📦'}</div>
+      <div class="info">
+        <div class="nm">${esc(i.name)||'(sem nome — abrir link)'}</div>
+        ${link?`<a class="lk" href="${esc(link)}" target="_blank">${esc(link)}</a>`:''}
+        <div class="note" onclick="editNote('${i.id}')">${i.data.note?('📝 '+esc(i.data.note)):'＋ adicionar nota'}</div>
+      </div>
+      <div class="rt">${b}
+        <div class="act">
+          <button class="go" onclick="cadastrar('${i.id}')">Cadastrar →</button>
+          <button onclick="toggleDone('${i.id}')">${i.status==='done'?'Reabrir':'✓ Feito'}</button>
+          <button class="del" onclick="delQueue('${i.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text3);padding:50px">Nenhum produto aqui. Cole um link acima para adicionar.</div>';
+}
+function pickCat(id){ curCat=id; renderFila(); }
+function filaFilter(f,el){ filaFilt=f; document.querySelectorAll('.fqh .filt button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); renderQueue(); }
+function addCategory(){
+  const nm=prompt('Nome da categoria (ex: Chaveiros, Fórmula 1):'); if(!nm||!nm.trim()) return;
+  const ic=(prompt('Um emoji para o ícone (opcional):','📁')||'📁').trim()||'📁';
+  const id=uid(); saveItem({id,kind:'category',name:nm.trim(),status:'',deleted:false,updated_at:Date.now(),data:{icon:ic,order:catList().length}});
+  curCat=id; renderFila();
+}
+function editCategory(id){
+  const c=L[id]; if(!c) return;
+  const nm=prompt('Renomear a categoria (apague o nome e confirme para EXCLUIR):', c.name);
+  if(nm===null) return;
+  if(!nm.trim()){
+    if(confirm('Excluir a categoria "'+c.name+'" e os '+queueOf(id).length+' produtos dela?')){
+      c.deleted=true; c.updated_at=Date.now(); saveItem(c);
+      queueOf(id).forEach(q=>{ q.deleted=true; q.updated_at=Date.now(); saveItem(q); });
+      if(curCat===id) curCat=(catList()[0]||{}).id||null; renderFila();
+    } return;
+  }
+  const ic=prompt('Emoji do ícone:', c.data.icon||'📁');
+  c.name=nm.trim(); if(ic!==null) c.data.icon=ic.trim()||'📁'; c.updated_at=Date.now(); saveItem(c); renderFila();
+}
+function addQueueItem(){
+  if(!curCat){ toast('Crie uma categoria primeiro'); return; }
+  const link=$('fqLink').value.trim(), name=$('fqName').value.trim();
+  if(!link && !name){ $('fqLink').focus(); return; }
+  const id=uid(); saveItem({id,kind:'queue',name,status:'pend',deleted:false,updated_at:Date.now(),data:{link,note:'',catId:curCat}});
+  $('fqLink').value=''; $('fqName').value=''; renderFila();
+}
+function editNote(id){ const i=L[id]; if(!i) return; const n=prompt('Nota / instruções para este produto:', i.data.note||''); if(n===null) return; i.data.note=n.trim(); i.updated_at=Date.now(); saveItem(i); renderQueue(); }
+function toggleDone(id){ const i=L[id]; if(!i) return; i.status = i.status==='done'?'pend':'done'; i.updated_at=Date.now(); saveItem(i); renderFila(); }
+function delQueue(id){ const i=L[id]; if(!i) return; if(!confirm('Remover este item da fila?')) return; i.deleted=true; i.updated_at=Date.now(); saveItem(i); renderFila(); }
+function cadastrar(id){
+  const i=L[id]; if(!i) return;
+  i.status='doing'; i.updated_at=Date.now(); saveItem(i);
+  newListingSilent();
+  $('listTitle').value=i.name||'';
+  window.curSourceLink=i.data.link||''; window.curQueueId=id; updateSrcChip();
+  closeFila(); toast('Abra o link do produto, salve a foto e adicione as medidas');
+}
+function newListingSilent(){ curListingId=null; setStatus('draft'); window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; }
+function updateSrcChip(){ const c=$('srcChip'); if(window.curSourceLink){ c.href=window.curSourceLink; c.textContent='🔗 '+window.curSourceLink.replace(/^https?:\/\//,'').slice(0,42); c.style.display='inline-flex'; } else c.style.display='none'; }
 
 /* ---- INIT ---- */
 setStatus('draft'); calc(); updateAuthUI();
