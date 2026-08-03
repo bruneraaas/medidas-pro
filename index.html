@@ -238,8 +238,8 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
 .check{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px}
 .check .cht{font-size:11px;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
 .check .cht b{color:var(--accent);font-family:'Saira Condensed';font-size:13px;text-transform:none}
-.check .chgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.chit{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 4px;font-size:10.5px;display:flex;align-items:center;gap:5px;justify-content:center;color:var(--text3)}
+.check .chgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.chit{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 6px;font-size:10.5px;display:flex;align-items:center;gap:5px;justify-content:center;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chit.on{border-color:var(--accent-dim);color:var(--accent)}
 .chit .m{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
 .chit.on .m{background:var(--accent);border-color:var(--accent);color:#0e0f12}
@@ -320,7 +320,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.0</div>
+        <div class="sub">Fotos com medidas para eBay · v3.1</div>
       </div>
     </div>
 
@@ -521,24 +521,22 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
   </div>
 </div>
 
-<!-- BIBLIOTECA DE ANÚNCIOS -->
-<div class="ov" id="listOv">
-  <div class="ov-card wide">
-    <div class="ov-h">
-      <span class="t">Meus anúncios</span>
-      <div style="display:flex;gap:10px;align-items:center">
-        <span id="listSync" style="font-size:12px;color:var(--text3)"></span>
-        <button class="ov-x" onclick="closeLists()">×</button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-      <div class="tabs" style="max-width:340px;margin-bottom:0">
-        <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
-        <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
-        <button id="fReady" onclick="filterLists('ready')">Pronto</button>
-        <button id="fDone" onclick="filterLists('done')">Publicado</button>
-      </div>
-      <button class="btn btn-ghost" onclick="downloadBackup()" style="margin-left:auto;padding:8px 14px;font-size:12.5px">💾 Baixar backup (.zip)</button>
+<!-- BIBLIOTECA DE ANÚNCIOS (tela cheia) -->
+<div class="full" id="listFull">
+  <div class="full-top">
+    <div class="logo" style="width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#0e0f12;font-weight:800">📚</div>
+    <div><div class="ft">Meus anúncios</div><div class="fsub">Todos os anúncios cadastrados</div></div>
+    <span class="spacer" style="flex:1"></span>
+    <span id="listSync" style="font-size:12px;color:var(--text3);margin-right:6px"></span>
+    <button class="btn btn-ghost" onclick="downloadBackup()" style="padding:8px 14px;margin-right:8px">💾 Backup (.zip)</button>
+    <button class="btn btn-ghost" onclick="closeLists()" style="padding:8px 16px">✕ Fechar</button>
+  </div>
+  <div style="padding:18px 22px;overflow-y:auto;flex:1">
+    <div class="tabs" style="max-width:400px;margin-bottom:16px">
+      <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
+      <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
+      <button id="fReady" onclick="filterLists('ready')">Pronto</button>
+      <button id="fDone" onclick="filterLists('done')">Publicado</button>
     </div>
     <div class="grid" id="listGrid"></div>
   </div>
@@ -1485,10 +1483,21 @@ async function saveListing(){
     }
   }
   const item=collectListing(); item._dirty=true; L[item.id]=item; saveLocal();
+  let msg;
   if(auth){ const ok=await pushItem(item); if(ok){ item._dirty=false; saveLocal(); }
-    toast(ok?'✓ Salvo e sincronizado':'Salvo — sincroniza quando reconectar'); }
-  else toast('Salvo neste computador · entre para sincronizar (fotos precisam de conta)');
+    msg = ok?'✓ Salvo e sincronizado':'Salvo — sincroniza quando reconectar'; }
+  else msg = 'Salvo neste computador · entre para sincronizar (fotos precisam de conta)';
+  toast(msg);
+  // Feedback visual no botão
+  const b=$('saveListBtn'), original=b.textContent;
+  b.textContent='✓ Salvo!'; b.style.background='#22c55e'; b.style.color='#fff';
+  setTimeout(()=>{ b.textContent=original; b.style.background=''; b.style.color=''; }, 1800);
   refreshChecklist();
+  // Se checklist=5/5 e ainda é rascunho, sugere marcar como Pronto
+  const s=checkState(); const allDone=Object.values(s).every(Boolean);
+  if(allDone && curStatus==='draft'){
+    setTimeout(()=>toast('💡 Anúncio completo! Clique em "Pronto" para liberar a publicação'), 2000);
+  }
 }
 function newListing(){ curListingId=null; $('listTitle').value=''; _origSetStatus('draft');
   window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none';
@@ -1509,8 +1518,8 @@ $('saveListBtn').onclick=saveListing;
 
 /* ---- BIBLIOTECA (overlay) ---- */
 $('openListsBtn').onclick=async()=>{ openLists(); if(auth) await syncAll(); };
-function openLists(){ $('listOv').classList.add('open'); renderLists(); }
-function closeLists(){ $('listOv').classList.remove('open'); }
+function openLists(){ $('listFull').classList.add('open'); renderLists(); }
+function closeLists(){ $('listFull').classList.remove('open'); }
 function filterLists(f){ listFilter=f;
   [['fAll','all'],['fDraft','draft'],['fReady','ready'],['fDone','done']].forEach(([bId,v])=>$(bId).classList.toggle('on', v===f));
   renderLists(); }
@@ -1561,7 +1570,7 @@ async function doAuth(){
 }
 $('auGo').onclick=doAuth;
 ['auUser','auPass','auInvite'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doAuth(); }));
-[$('authOv'),$('listOv')].forEach(ov=>ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); }));
+[$('authOv')].forEach(ov=>ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); }));
 
 /* ---- SINCRONIZAÇÃO ---- */
 async function api(path,opts={}){ opts.headers=Object.assign({'Content-Type':'application/json'},opts.headers||{});
