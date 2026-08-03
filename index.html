@@ -234,6 +234,71 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
 .srcchip{display:inline-flex;align-items:center;gap:6px;background:#16202a;border:1px solid #24405a;color:#8fc3ee;border-radius:20px;padding:5px 12px;font-size:12px;text-decoration:none;max-width:320px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .srcchip:hover{border-color:#5aa9e6}
 
+/* Checklist do anúncio */
+.check{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.check .cht{font-size:11px;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.check .cht b{color:var(--accent);font-family:'Saira Condensed';font-size:13px;text-transform:none}
+.check .chgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.chit{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 4px;font-size:10.5px;display:flex;align-items:center;gap:5px;justify-content:center;color:var(--text3)}
+.chit.on{border-color:var(--accent-dim);color:var(--accent)}
+.chit .m{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
+.chit.on .m{background:var(--accent);border-color:var(--accent);color:#0e0f12}
+.check .bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:7px}
+.check .bar>span{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+/* Foto principal + upload progresso */
+.thumb .main-badge{position:absolute;top:2px;left:2px;font-size:8px;background:var(--accent);color:#0e0f12;border-radius:4px;padding:1px 5px;font-weight:700;letter-spacing:.03em}
+.thumb .setmain{position:absolute;top:2px;left:2px;background:rgba(0,0,0,.7);color:#fff;border:none;font-size:9px;padding:2px 5px;border-radius:4px;cursor:pointer;display:none;font-weight:600}
+.thumb:hover .setmain{display:block}
+.thumb.cur .setmain{display:none}
+.thumb.cur.mainph .setmain{display:none}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;padding:40px 60px}
+.lb.open{display:flex}
+.lb .lbimg{max-width:100%;max-height:100%;object-fit:contain;background:#e9e7e4;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lb .lbtop{position:absolute;top:16px;left:0;right:0;display:flex;align-items:center;gap:12px;padding:0 20px;color:var(--text)}
+.lb .lbtop .lbinfo{flex:1;font-size:13px;color:var(--text2)}
+.lb .lbtop .lbinfo b{color:var(--text);font-weight:600}
+.lb .lbtop button{background:var(--panel2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px}
+.lb .lbtop button:hover{border-color:var(--accent);color:var(--accent)}
+.lb .lbtop .lbclose{width:38px;padding:0;font-size:20px}
+.lb .lbnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(30,33,39,.85);border:1px solid var(--border2);color:#fff;width:46px;height:46px;border-radius:50%;font-size:22px;cursor:pointer;font-family:inherit}
+.lb .lbnav:hover{background:var(--accent);color:#0e0f12;border-color:var(--accent)}
+.lb .lbprev{left:12px}.lb .lbnext{right:12px}
+.lb .lbfoot{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:var(--text3);font-size:11.5px}
+.lb .lbfoot kbd{background:var(--panel2);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-family:inherit;font-size:11px;color:var(--text2);margin:0 2px}
+.thumb, #cv, .pubph{cursor:zoom-in}
+
+/* PUBLICAR */
+.pubgrid{display:grid;grid-template-columns:320px 1fr;gap:18px}
+@media(max-width:760px){.pubgrid{grid-template-columns:1fr}}
+.pubph-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pubph{aspect-ratio:1;background:var(--panel2);border:1px solid var(--border);border-radius:9px;overflow:hidden;position:relative}
+.pubph.main{border:2px solid var(--accent)}
+.pubph img{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.pubph .lbl{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.75);color:#fff;font-size:9.5px;padding:2px 5px;border-radius:4px;font-weight:600}
+.pubph .lbl.p{background:var(--accent);color:#0e0f12}
+.field2{margin-bottom:12px}
+.lab2{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.lab2 .cc{margin-left:auto;font-family:'Saira Condensed';font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0}
+.lab2 .cc.warn{color:#e0b84a}
+.row2{display:flex;gap:8px}
+.val2{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13.5px;min-height:38px;display:flex;align-items:center;color:var(--text)}
+.val2.big{font-family:'Saira Condensed';font-size:20px;color:var(--accent);font-weight:700}
+.val2.desc{display:block;white-space:pre-wrap;line-height:1.55;font-size:12.5px;max-height:220px;overflow-y:auto;user-select:text}
+.copy2{background:var(--panel2);border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:0 12px;font-weight:600;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;flex-shrink:0}
+.copy2:hover{border-color:var(--accent);color:var(--accent)}
+.copy2.done{background:var(--accent);color:#0e0f12;border-color:var(--accent)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tipbox{background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--text2);line-height:1.55;margin-top:10px}
+.tipbox b{color:var(--text)}
+.dlzip{background:var(--accent);color:#0e0f12;border:none;border-radius:9px;padding:11px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;width:100%;margin-top:8px}
+.dlzip:disabled{opacity:.6;cursor:wait}
+.pubfoot{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+.pubebay{background:#e53238;color:#fff;text-decoration:none;border-radius:9px;padding:11px 16px;font-weight:700;font-family:inherit;font-size:13px;display:inline-flex;align-items:center;gap:8px}
+.markpub{margin-left:auto;background:var(--accent);color:#0e0f12;border:none;border-radius:9px;padding:11px 18px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px}
+
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--accent);color:#0e0f12;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
@@ -255,7 +320,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v2.3</div>
+        <div class="sub">Fotos com medidas para eBay · v3.0</div>
       </div>
     </div>
 
@@ -266,6 +331,18 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
         <button data-s="ready">Pronto</button>
         <button data-s="done">Publicado</button>
       </div>
+    </div>
+
+    <div class="check" id="checkBar">
+      <div class="cht">Progresso <b id="chFrac">0/5</b></div>
+      <div class="chgrid">
+        <div class="chit" data-ch="title"><span class="m"></span>Título</div>
+        <div class="chit" data-ch="photo"><span class="m"></span>Foto</div>
+        <div class="chit" data-ch="ms"><span class="m"></span>Medidas</div>
+        <div class="chit" data-ch="desc"><span class="m"></span>Descrição</div>
+        <div class="chit" data-ch="price"><span class="m"></span>Preço</div>
+      </div>
+      <div class="bar"><span id="chBar" style="width:0%"></span></div>
     </div>
 
     <div class="slabel">Fotos</div>
@@ -375,6 +452,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <span class="spacer"></span>
       <button class="btn btn-ghost" id="redetectBtn" style="padding:8px 14px;display:none">↻ Reposicionar setas</button>
       <button class="btn btn-accent" id="saveListBtn" style="padding:8px 14px">💾 Salvar anúncio</button>
+      <button class="btn btn-ghost" id="openPubBtn" style="padding:8px 14px;display:none">🛒 Publicar</button>
       <button class="btn btn-ghost" id="openFilaBtn" style="padding:8px 14px">📋 Fila</button>
       <button class="btn btn-ghost" id="openListsBtn" style="padding:8px 14px">📚 Anúncios</button>
       <button class="chip" id="authChip"><span class="dot" id="authDot"></span><span id="authTxt">Entrar</span></button>
@@ -453,16 +531,76 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
         <button class="ov-x" onclick="closeLists()">×</button>
       </div>
     </div>
-    <div class="tabs" style="max-width:340px">
-      <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
-      <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
-      <button id="fReady" onclick="filterLists('ready')">Pronto</button>
-      <button id="fDone" onclick="filterLists('done')">Publicado</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="tabs" style="max-width:340px;margin-bottom:0">
+        <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
+        <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
+        <button id="fReady" onclick="filterLists('ready')">Pronto</button>
+        <button id="fDone" onclick="filterLists('done')">Publicado</button>
+      </div>
+      <button class="btn btn-ghost" onclick="downloadBackup()" style="margin-left:auto;padding:8px 14px;font-size:12.5px">💾 Baixar backup (.zip)</button>
     </div>
     <div class="grid" id="listGrid"></div>
   </div>
 </div>
 
+<!-- PUBLICAR NO EBAY -->
+<div class="ov" id="pubOv">
+  <div class="ov-card wide">
+    <div class="ov-h">
+      <div><div class="t" style="display:flex;align-items:center;gap:10px">🛒 Publicar no eBay</div><div style="font-size:12px;color:var(--text3);margin-top:2px" id="pubSub">Tudo pronto — copie e cole no eBay UK</div></div>
+      <button class="ov-x" onclick="closePub()">×</button>
+    </div>
+    <div class="pubgrid">
+      <div>
+        <div class="lab2">Fotos <span class="cc" id="pubPhCount">0</span></div>
+        <div class="pubph-wrap" id="pubPhotos"></div>
+        <button class="dlzip" id="dlZipBtn">⬇ Baixar todas as fotos (.zip)</button>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:8px" id="pubSrc"></div>
+      </div>
+      <div>
+        <div class="field2">
+          <div class="lab2">Título do anúncio <span class="cc" id="pubTitleCC">0 / 80</span></div>
+          <div class="row2"><div class="val2" id="pubTitle"></div><button class="copy2" onclick="cpFrom('pubTitle',this)">Copiar</button></div>
+        </div>
+        <div class="duo">
+          <div class="field2">
+            <div class="lab2">Preço</div>
+            <div class="row2"><div class="val2 big" id="pubPrice">£0.00</div><button class="copy2" onclick="cpFrom('pubPrice',this,true)">Copiar</button></div>
+          </div>
+          <div class="field2">
+            <div class="lab2">Frete</div>
+            <div class="row2"><div class="val2 big" id="pubShip" style="color:var(--text)">£0.00</div><button class="copy2" onclick="cpFrom('pubShip',this,true)">Copiar</button></div>
+          </div>
+        </div>
+        <div class="field2">
+          <div class="lab2">Descrição</div>
+          <div class="row2"><div class="val2 desc" id="pubDesc"></div><button class="copy2" onclick="cpFrom('pubDesc',this)">Copiar</button></div>
+        </div>
+        <div class="tipbox" id="pubTip"></div>
+      </div>
+    </div>
+    <div class="pubfoot">
+      <a class="pubebay" href="https://www.ebay.co.uk/sl/sell" target="_blank">🛍️ Abrir eBay para vender →</a>
+      <button class="markpub" onclick="markPublished()">✓ Marcar como Publicado</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="if(event.target.id==='lb')closeLB()">
+  <div class="lbtop">
+    <div class="lbinfo"><b id="lbTitle"></b> <span id="lbSize" style="color:var(--text3)"></span></div>
+    <button onclick="lbDownload()">⬇ Baixar esta foto</button>
+    <button class="lbclose" onclick="closeLB()">×</button>
+  </div>
+  <button class="lbnav lbprev" onclick="lbNav(-1)">‹</button>
+  <img class="lbimg" id="lbImg" alt=""/>
+  <button class="lbnav lbnext" onclick="lbNav(1)">›</button>
+  <div class="lbfoot">Use <kbd>←</kbd> <kbd>→</kbd> para navegar &nbsp;·&nbsp; <kbd>Esc</kbd> para fechar</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -573,15 +711,22 @@ function removePhoto(p, ev){
 
 function renderStrip(){
   $('strip').innerHTML='';
+  if(photos.length && !photos.some(p=>p.main)) photos[0].main=true;
   photos.forEach(p=>{
     const d=document.createElement('div');
-    d.className='thumb'+(p===cur?' cur':'');
+    d.className='thumb'+(p===cur?' cur':'')+(p.main?' mainph':'');
     const done=hasContent(p);
-    d.innerHTML=`<img src="${p.url}"/>${done?'<span class="ok">✓</span>':''}<button class="x">✕</button>`;
+    const badge = p.main
+      ? '<span class="main-badge">PRINCIPAL</span>'
+      : '<button class="setmain" title="Definir como foto principal">★ principal</button>';
+    d.innerHTML=`<img src="${p.url}"/>${badge}${done?'<span class="ok">✓</span>':''}<button class="x">✕</button>`;
     d.onclick=()=>selectPhoto(p);
     d.querySelector('.x').onclick=e=>removePhoto(p,e);
+    const sm=d.querySelector('.setmain'); if(sm) sm.onclick=e=>{ e.stopPropagation(); photos.forEach(x=>x.main=false); p.main=true; renderStrip(); refreshChecklist(); };
+    const im=d.querySelector('img'); if(im){ im.style.cursor='zoom-in'; im.ondblclick=e=>{ e.stopPropagation(); openLB(photos.indexOf(p)); }; }
     $('strip').appendChild(d);
   });
+  refreshChecklist();
 }
 
 /* ══════════ OBJECT DETECTION ══════════ */
@@ -1294,39 +1439,64 @@ function collectListing(){
   return { id:curListingId, kind:'listing', name:title||(cur&&cur.name)||'Sem título',
     status:curStatus, deleted:false, updated_at:Date.now(),
     data:{ title, measures: cur?cleanMs(cur.ms):(prev.measures||[]),
+      photos: photos.length? photosSerialize() : (prev.photos||[]),
       style:Object.assign({},style), descInfo:$('descInfo').value,
       description:descText(), price:calc(),
       sourceLink: window.curSourceLink||prev.sourceLink||'', queueId: window.curQueueId||prev.queueId||'' } };
 }
-function applyListing(it){
+async function applyListing(it){
   curListingId=it.id; const d=it.data||{};
-  $('listTitle').value=d.title||it.name||''; setStatus(it.status||'draft');
+  $('listTitle').value=d.title||it.name||''; _origSetStatus(it.status||'draft');
   if(d.price) setCalc(d.price); else calc();
   $('descInfo').value=d.descInfo||'';
   if(d.description){ window.lastDescription=d.description; $('aiOut').style.display='block'; $('aiOut').classList.remove('loading'); $('aiOut').textContent=d.description; $('copyDescBtn').style.display='block'; }
   else { window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; }
   if(d.style){ Object.assign(style,d.style); saveStyle(); reflectStyle(); }
   window.curSourceLink=d.sourceLink||''; window.curQueueId=d.queueId||''; updateSrcChip();
-  const ms=cleanMs(d.measures);
-  if(cur){ cur.ms=ms.map(m=>Object.assign({},m)); sel=cur.ms[0]||null; renderList(); draw(); }
-  else { window.pendingMs=ms; }
-  toast('Anúncio carregado'+(cur||!ms.length?'':' — adicione a foto para ver as medidas'));
+  // Fotos: baixa do R2 se houver metadata
+  photos.forEach(p=>{ try{URL.revokeObjectURL(p.url);}catch(e){} });
+  photos=[]; cur=null; sel=null;
+  if(d.photos && d.photos.length && auth){
+    toast('Baixando '+d.photos.length+' foto(s)…');
+    for(const meta of d.photos){
+      const r=await fetchPhoto(meta); if(!r) continue;
+      const p={id:idSeq++, name:meta.name||'foto', img:r.img, url:r.url, ms:(meta.ms||[]).map(m=>Object.assign({id:idSeq++},m)), bbox:meta.bbox||null, rid:meta.rid, main:!!meta.main, _uploaded:true};
+      photos.push(p);
+    }
+    if(photos.length){ cur=photos.find(p=>p.main)||photos[0]; sel=cur.ms[0]||null; }
+  }else if(d.measures && d.measures.length){
+    // compatibilidade com anúncios v2.0 (só medidas, sem fotos)
+    window.pendingMs=cleanMs(d.measures);
+  }
+  selectPhoto(cur); renderStrip(); renderList(); draw(); refreshChecklist();
 }
 
 /* ---- SALVAR / NOVO / CARREGAR / EXCLUIR ---- */
 async function saveListing(){
   if(!$('listTitle').value.trim() && !cur){ toast('Dê um título ao anúncio'); $('listTitle').focus(); return; }
   if(!curListingId) curListingId=uid();
+  // Upload das fotos novas para o R2 (antes de salvar o item, para gravarmos os RIDs certos)
+  if(auth && photos.length){
+    const toUp=photos.filter(p=>!p._uploaded);
+    if(toUp.length){
+      $('saveListBtn').textContent='📤 Enviando fotos…'; $('saveListBtn').disabled=true;
+      for(const p of toUp){ await uploadPhoto(p); }
+      $('saveListBtn').textContent='💾 Salvar anúncio'; $('saveListBtn').disabled=false;
+    }
+  }
   const item=collectListing(); item._dirty=true; L[item.id]=item; saveLocal();
   if(auth){ const ok=await pushItem(item); if(ok){ item._dirty=false; saveLocal(); }
     toast(ok?'✓ Salvo e sincronizado':'Salvo — sincroniza quando reconectar'); }
-  else toast('Salvo neste computador · entre para sincronizar');
+  else toast('Salvo neste computador · entre para sincronizar (fotos precisam de conta)');
+  refreshChecklist();
 }
-function newListing(){ curListingId=null; $('listTitle').value=''; setStatus('draft');
+function newListing(){ curListingId=null; $('listTitle').value=''; _origSetStatus('draft');
   window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none';
   window.curSourceLink=''; window.curQueueId=''; updateSrcChip();
+  photos.forEach(p=>{ try{URL.revokeObjectURL(p.url);}catch(e){} }); photos=[]; cur=null; sel=null;
+  renderStrip(); renderList(); draw(); refreshChecklist();
   closeLists(); $('listTitle').focus(); toast('Novo anúncio — preencha e salve'); }
-function loadListing(id){ if(L[id]){ applyListing(L[id]); closeLists(); } }
+async function loadListing(id){ if(L[id]){ closeLists(); await applyListing(L[id]); } }
 async function delListing(id){
   if(!L[id]) return;
   if(!confirm('Excluir "'+(L[id].name||'anúncio')+'"?')) return;
@@ -1497,11 +1667,158 @@ function cadastrar(id){
   window.curSourceLink=i.data.link||''; window.curQueueId=id; updateSrcChip();
   closeFila(); toast('Abra o link do produto, salve a foto e adicione as medidas');
 }
-function newListingSilent(){ curListingId=null; setStatus('draft'); window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; }
+function newListingSilent(){ curListingId=null; _origSetStatus('draft'); window.lastDescription=''; $('aiOut').style.display='none'; $('copyDescBtn').style.display='none'; photos.forEach(p=>{ try{URL.revokeObjectURL(p.url);}catch(e){} }); photos=[]; cur=null; sel=null; renderStrip(); renderList(); draw(); refreshChecklist(); }
 function updateSrcChip(){ const c=$('srcChip'); if(window.curSourceLink){ c.href=window.curSourceLink; c.textContent='🔗 '+window.curSourceLink.replace(/^https?:\/\//,'').slice(0,42); c.style.display='inline-flex'; } else c.style.display='none'; }
 
+/* ══════════ CHECKLIST DO ANÚNCIO ══════════ */
+function checkState(){
+  const title=$('listTitle').value.trim().length>0;
+  const photo=photos.length>0;
+  const ms=photos.some(p=>p.ms.some(m=>m.type!=='text'&&parseFloat(m.value)));
+  const desc=!!(window.lastDescription&&window.lastDescription.trim().length>20);
+  const price=(parseFloat($('cGrams').value)||0)>0 || (calc().listed>0);
+  return {title,photo,ms,desc,price};
+}
+function refreshChecklist(){
+  const s=checkState();
+  const items={title:'title',photo:'photo',ms:'ms',desc:'desc',price:'price'};
+  let n=0; Object.keys(items).forEach(k=>{ const el=document.querySelector('.chit[data-ch='+k+']'); if(!el) return; const on=s[k]; el.classList.toggle('on',on); el.querySelector('.m').textContent=on?'✓':''; if(on)n++; });
+  $('chFrac').textContent=n+'/5';
+  $('chBar').style.width=(n*20)+'%';
+  const ready=n===5;
+  $('openPubBtn').style.display = (ready && curListingId) ? 'inline-flex' : 'none';
+  const readyBtn=document.querySelector('#statusRow button[data-s=ready]');
+  const doneBtn=document.querySelector('#statusRow button[data-s=done]');
+  if(readyBtn){ readyBtn.disabled=!ready; readyBtn.title=ready?'':'Complete o checklist antes'; readyBtn.style.opacity=ready?'1':'.5'; readyBtn.style.cursor=ready?'pointer':'not-allowed'; }
+  if(doneBtn){ doneBtn.disabled=!ready; doneBtn.style.opacity=ready?'1':'.5'; doneBtn.style.cursor=ready?'pointer':'not-allowed'; }
+}
+['listTitle','cGrams','cKg','cHours','cPack','cShip','cMargin','cAd'].forEach(id=>$(id).addEventListener('input',refreshChecklist));
+const _originalRenderList=renderList;
+renderList=function(){ _originalRenderList.apply(this,arguments); refreshChecklist(); };
+const _origSetStatus=setStatus;
+setStatus=function(s){ const st=checkState(); const ready=Object.values(st).every(Boolean); if((s==='ready'||s==='done')&&!ready){ toast('Complete o checklist antes de marcar como '+(s==='ready'?'Pronto':'Publicado')); return; } _origSetStatus(s); refreshChecklist(); };
+
+/* ══════════ LIGHTBOX ══════════ */
+let lbIdx=0;
+function openLB(i){
+  if(!photos.length) return;
+  lbIdx=Math.max(0,Math.min(i, photos.length-1));
+  renderLB(); $('lb').classList.add('open');
+}
+function closeLB(){ $('lb').classList.remove('open'); }
+function lbNav(d){ lbIdx=(lbIdx+d+photos.length)%photos.length; renderLB(); }
+function renderLB(){
+  const p=photos[lbIdx]; if(!p) return closeLB();
+  const c=document.createElement('canvas'), img=p.img;
+  c.width=img.naturalWidth; c.height=img.naturalHeight;
+  const x=c.getContext('2d');
+  x.fillStyle=(p.bbox&&p.bbox.bg)||'#ffffff'; x.fillRect(0,0,c.width,c.height);
+  x.drawImage(img,0,0);
+  (p.ms||[]).forEach(m=>drawMeasure(x,m,0,0,c.width,c.height,false));
+  $('lbImg').src=c.toDataURL('image/jpeg',0.94);
+  $('lbTitle').textContent = `Foto ${lbIdx+1} de ${photos.length}${p.main?' (PRINCIPAL)':''}`;
+  $('lbSize').textContent = ` · original ${img.naturalWidth} × ${img.naturalHeight} px`;
+}
+async function lbDownload(){
+  const p=photos[lbIdx]; if(!p) return;
+  const b=await exportPhoto(p);
+  downloadBlob(b,(p.name||'foto')+'-medidas.jpg');
+}
+document.addEventListener('keydown',e=>{
+  if(!$('lb').classList.contains('open')) return;
+  if(e.key==='Escape') closeLB();
+  if(e.key==='ArrowLeft') lbNav(-1);
+  if(e.key==='ArrowRight') lbNav(1);
+});
+cv.addEventListener('dblclick',()=>{ if(cur){ openLB(photos.indexOf(cur)); } });
+
+/* ══════════ SYNC DAS FOTOS COM R2 ══════════ */
+async function fetchAuth(path,opts={}){ opts.headers=Object.assign({},opts.headers||{}); if(auth) opts.headers.Authorization='Bearer '+auth.token; return fetch(API+path,opts); }
+async function photoToBlob(p){
+  const c=document.createElement('canvas'); c.width=p.img.naturalWidth; c.height=p.img.naturalHeight;
+  c.getContext('2d').drawImage(p.img,0,0);
+  return new Promise(res=>c.toBlob(res,'image/jpeg',0.92));
+}
+async function uploadPhoto(p){
+  if(!auth) return;
+  if(!p.rid) p.rid=uid()+'.jpg';
+  const blob=await photoToBlob(p);
+  const r=await fetchAuth('/api/photos/'+p.rid,{method:'PUT',headers:{'Content-Type':'image/jpeg'},body:blob});
+  if(r.ok){ p._uploaded=true; return true; }
+  return false;
+}
+async function fetchPhoto(meta){
+  const r=await fetchAuth('/api/photos/'+meta.rid);
+  if(!r.ok) return null;
+  const blob=await r.blob(); const url=URL.createObjectURL(blob);
+  return new Promise(res=>{ const im=new Image(); im.onload=()=>res({img:im,url}); im.onerror=()=>res(null); im.src=url; });
+}
+function photosSerialize(){ return photos.map(p=>({rid:p.rid,name:p.name,main:!!p.main,ms:cleanMs(p.ms),bbox:p.bbox})); }
+
+/* ══════════ PUBLICAR ══════════ */
+$('openPubBtn').onclick=openPub;
+function openPub(){ if(!curListingId){ toast('Salve o anúncio primeiro'); return; } renderPub(); $('pubOv').classList.add('open'); }
+function closePub(){ $('pubOv').classList.remove('open'); }
+function renderPub(){
+  const it=L[curListingId]; if(!it) return;
+  const d=it.data||{};
+  $('pubTitle').textContent = d.title || it.name || '';
+  const cc=(d.title||it.name||'').length; const el=$('pubTitleCC'); el.textContent=cc+' / 80'; el.classList.toggle('warn',cc>80);
+  $('pubPrice').textContent = d.price&&d.price.listed ? money(d.price.listed) : '—';
+  $('pubShip').textContent  = d.price&&d.price.ship ? money(d.price.ship) : '£0.00';
+  $('pubDesc').textContent  = d.description || '(sem descrição)';
+  $('pubSrc').innerHTML = d.sourceLink ? '🔗 <a href="'+esc(d.sourceLink)+'" target="_blank" style="color:#5aa9e6">'+esc(d.sourceLink.replace(/^https?:\/\//,'').slice(0,50))+'</a>' : '';
+  const ordered = [...(cur?photos:[])].sort((a,b)=>(b.main?1:0)-(a.main?1:0));
+  $('pubPhotos').innerHTML = ordered.map((p,i)=>`<div class="pubph ${p.main?'main':''}" onclick="openLB(${photos.indexOf(p)})"><img src="${p.url}"/><span class="lbl ${p.main?'p':''}">${i+1}${p.main?' PRINCIPAL':''}</span></div>`).join('') || '<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">Sem fotos carregadas — abra o anúncio no editor primeiro.</div>';
+  $('pubPhCount').textContent=ordered.length+(ordered.length===1?' foto':' fotos');
+  $('pubTip').innerHTML = '💡 <b>Ao publicar no eBay lembre-se:</b> ✓ escolher a categoria certa &nbsp; ✓ conferir peso do item para o frete &nbsp; ✓ material (PLA) &nbsp; ✓ condição: Novo';
+}
+function cpFrom(id,btn,priceStripPound){
+  let t=$(id).textContent; if(priceStripPound) t=t.replace('£','');
+  navigator.clipboard.writeText(t).then(()=>{ btn.textContent='✓ Copiado'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent='Copiar'; btn.classList.remove('done'); },1500); });
+}
+$('dlZipBtn').onclick=async()=>{
+  const b=$('dlZipBtn'); b.disabled=true; b.textContent='Preparando…';
+  try{
+    const zip=new JSZip();
+    for(let i=0;i<photos.length;i++){
+      const p=photos[i]; const blob=await exportPhoto(p);
+      const label = p.main? '01-principal' : String(i+1).padStart(2,'0');
+      zip.file(`${label}.jpg`, blob);
+    }
+    const out=await zip.generateAsync({type:'blob'});
+    downloadBlob(out, (($('listTitle').value.trim()||'anuncio').replace(/[^\w-]+/g,'-'))+'-fotos.zip');
+    b.textContent='✓ Baixado';
+  }catch(e){ b.textContent='Erro'; toast('Erro no ZIP: '+e.message); }
+  setTimeout(()=>{ b.disabled=false; b.textContent='⬇ Baixar todas as fotos (.zip)'; },1800);
+};
+async function markPublished(){ setStatus('done'); await saveListing(); closePub(); toast('✓ Marcado como Publicado'); }
+
+/* ══════════ BACKUP COMPLETO (.zip) ══════════ */
+async function downloadBackup(){
+  toast('Gerando backup…');
+  const zip=new JSZip();
+  const idx=[];
+  const list=Object.values(L).filter(x=>!x.deleted&&x.kind==='listing');
+  for(const it of list){
+    const folder=zip.folder(it.name.replace(/[^\w-]+/g,'-')+'-'+it.id.slice(-6));
+    folder.file('dados.json', JSON.stringify(it,null,2));
+    if(auth && it.data.photos){
+      for(let i=0;i<it.data.photos.length;i++){
+        const meta=it.data.photos[i];
+        try{ const r=await fetchAuth('/api/photos/'+meta.rid); if(r.ok){ const b=await r.blob(); folder.file((meta.main?'01-principal':String(i+1).padStart(2,'0'))+'.jpg', b); } }catch(e){}
+      }
+    }
+    idx.push({id:it.id, name:it.name, status:it.status, price:it.data.price&&it.data.price.listed, updated_at:new Date(it.updated_at).toISOString()});
+  }
+  zip.file('index.json', JSON.stringify(idx,null,2));
+  const out=await zip.generateAsync({type:'blob'});
+  downloadBlob(out, 'medidas-backup-'+new Date().toISOString().slice(0,10)+'.zip');
+  toast('✓ Backup salvo');
+}
+
 /* ---- INIT ---- */
-setStatus('draft'); calc(); updateAuthUI();
+setStatus('draft'); calc(); updateAuthUI(); refreshChecklist();
 if(auth) syncAll();
 
 /* redraw once fonts are ready so canvas text uses the condensed font */

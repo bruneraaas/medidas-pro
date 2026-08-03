@@ -10,5 +10,8 @@
       "database_name": "medidas-db",
       "database_id": "b0c319ca-f5bd-4491-8bc0-5a5ca5ca1770"
     }
+  ],
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "medidas-photos" }
   ]
 }

@@ -147,6 +147,28 @@ export default {
         return json({ ok:true, updated_at: now });
       }
 
+      /* -------- FOTOS (R2) -------- */
+      // POST /api/photos/:id  body = binary image → salva no R2
+      const mPhotoPut = p.match(/^\/api\/photos\/([\w.-]+)$/);
+      if(mPhotoPut && (request.method === 'PUT' || request.method === 'POST')){
+        const key = mPhotoPut[1];
+        const ct = request.headers.get('Content-Type') || 'image/jpeg';
+        await env.PHOTOS.put(key, request.body, { httpMetadata: { contentType: ct }, customMetadata: { uploader: user } });
+        return json({ ok:true, id:key });
+      }
+      // GET /api/photos/:id → devolve a foto original (com auth)
+      if(mPhotoPut && request.method === 'GET'){
+        const obj = await env.PHOTOS.get(mPhotoPut[1]);
+        if(!obj) return json({ error:'foto não encontrada' }, 404);
+        const h = { ...headers, 'Content-Type': obj.httpMetadata?.contentType || 'image/jpeg', 'Cache-Control': 'private, max-age=3600' };
+        return new Response(obj.body, { headers: h });
+      }
+      // DELETE /api/photos/:id
+      if(mPhotoPut && request.method === 'DELETE'){
+        await env.PHOTOS.delete(mPhotoPut[1]);
+        return json({ ok:true });
+      }
+
       return json({ error: 'Rota não encontrada' }, 404);
     } catch(e){
       return json({ error: String((e && e.message) || e) }, 500);
