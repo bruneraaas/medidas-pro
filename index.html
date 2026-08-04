@@ -23,10 +23,12 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;overflow:hidden}
 
 /* ── LAYOUT ── */
-#app{display:grid;grid-template-columns:330px 1fr;grid-template-rows:100vh;height:100vh}
-aside{background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:18px 16px 40px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;cursor:grab;user-select:none;min-height:0}
-aside.dragging{cursor:grabbing}
-aside.dragging *{pointer-events:none}
+:root{--aside-w:330px}
+#app{display:grid;grid-template-columns:var(--aside-w) 6px 1fr;grid-template-rows:100vh;height:100vh}
+aside{background:var(--panel);overflow-y:auto;padding:18px 16px 40px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;min-height:0}
+.resizer{width:6px;cursor:col-resize;background:var(--border);position:relative;flex-shrink:0}
+.resizer:hover,.resizer.active{background:var(--accent-dim)}
+.resizer::after{content:'';position:absolute;top:0;bottom:0;left:-3px;right:-3px}
 main{display:flex;flex-direction:column;min-width:0;min-height:0}
 #topbar{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel)}
 #topbar .spacer{flex:1}
@@ -311,6 +313,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
   aside{order:2;border-right:none;border-top:1px solid var(--border);overflow:visible}
   main{order:1}
   #stage{height:58vh;flex:none}
+  .resizer{display:none}
 }
 </style>
 </head>
@@ -322,7 +325,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.5</div>
+        <div class="sub">Fotos com medidas para eBay · v3.6</div>
       </div>
     </div>
 
@@ -449,6 +452,8 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
     <div class="slabel" style="margin-top:22px">Salvar</div>
     <button class="btn btn-accent wide" id="saveListBtn" style="padding:14px;font-size:15px">💾 Salvar anúncio</button>
   </aside>
+
+  <div class="resizer" id="resizer" title="Arraste para redimensionar"></div>
 
   <main>
     <div id="topbar">
@@ -1871,24 +1876,31 @@ async function downloadBackup(){
   toast('✓ Backup salvo');
 }
 
-/* ══════════ ARRASTAR PARA ROLAR A BARRA LATERAL ══════════ */
+/* ══════════ REDIMENSIONAR A BARRA LATERAL (arrastar a linha divisória) ══════════ */
 (function(){
-  const asideEl=document.querySelector('aside');
-  if(!asideEl) return;
-  let dragging=false, startY=0, startScroll=0;
-  const blocked='input,select,button,textarea,a,.toggle,.sw,.thumb,.chit,.setmain,.rm-btn';
-  asideEl.addEventListener('mousedown',e=>{
-    if(e.target.closest(blocked)) return;
-    dragging=true; startY=e.clientY; startScroll=asideEl.scrollTop;
-    asideEl.classList.add('dragging');
+  const resizerEl=document.getElementById('resizer');
+  if(!resizerEl) return;
+  const MIN=260, MAX=560;
+  const saved=parseInt(localStorage.getItem('medidas_asidew')||'',10);
+  if(saved && saved>=MIN && saved<=MAX) document.documentElement.style.setProperty('--aside-w', saved+'px');
+  let dragging=false, startX=0, startW=330;
+  resizerEl.addEventListener('mousedown',e=>{
+    dragging=true; startX=e.clientX;
+    startW=document.querySelector('aside').getBoundingClientRect().width;
+    resizerEl.classList.add('active');
+    document.body.style.cursor='col-resize';
     e.preventDefault();
   });
   window.addEventListener('mousemove',e=>{
     if(!dragging) return;
-    asideEl.scrollTop = startScroll - (e.clientY - startY);
+    const w=Math.min(MAX,Math.max(MIN, startW + (e.clientX-startX)));
+    document.documentElement.style.setProperty('--aside-w', w+'px');
   });
   window.addEventListener('mouseup',()=>{
-    if(dragging){ dragging=false; asideEl.classList.remove('dragging'); }
+    if(!dragging) return;
+    dragging=false; resizerEl.classList.remove('active'); document.body.style.cursor='';
+    const w=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--aside-w'),10);
+    if(w) localStorage.setItem('medidas_asidew', w);
   });
 })();
 
