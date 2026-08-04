@@ -320,7 +320,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.2</div>
+        <div class="sub">Fotos com medidas para eBay · v3.3</div>
       </div>
     </div>
 
@@ -413,10 +413,23 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
         <div class="row"><label>Filamento (£/kg)</label><input type="number" id="cKg" value="10.5" step="0.1" min="0"/></div>
         <div class="row"><label>Gramas usadas</label><input type="number" id="cGrams" placeholder="0" step="1" min="0"/></div>
         <div class="row"><label>Tempo (horas)</label><input type="number" id="cHours" placeholder="0" step="0.5" min="0"/></div>
-        <div class="row"><label>Embalagem (£)</label><input type="number" id="cPack" placeholder="0" step="0.01" min="0"/></div>
-        <div class="row"><label>Frete (£)</label><input type="number" id="cShip" placeholder="0" step="0.01" min="0"/></div>
-        <div class="row"><label>Margem de lucro (%)</label><input type="number" id="cMargin" value="30" step="1" min="0"/></div>
-        <div class="row"><label>Taxa Ad eBay (%)</label><input type="number" id="cAd" value="10" step="0.1" min="0"/></div>
+        <div class="row"><label>Embalagem (£)</label><input type="number" id="cPack" value="0.10" step="0.01" min="0"/></div>
+        <div class="row"><label>Frete (Royal Mail)</label>
+          <select id="cShipPreset" onchange="applyShipPreset()" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:11.5px;padding:6px 8px;outline:none;font-family:'Inter';cursor:pointer">
+            <option value="">— escolha o frete —</option>
+            <option value="0.91">📮 £0.91 · Carta · ≤100g · fino (≤0.5cm)</option>
+            <option value="1.55">📬 £1.55 · Carta grande · ≤100g · ≤2.5cm</option>
+            <option value="1.90">📬 £1.90 · Carta grande · 100-250g · ≤2.5cm</option>
+            <option value="2.40">📬 £2.40 · Carta grande · 250-500g · ≤2.5cm</option>
+            <option value="2.70">📬 £2.70 · Carta grande · 500-750g · ≤2.5cm</option>
+            <option value="2.69">📦 £2.69 · Small Parcel · ≤1kg · qualquer espessura</option>
+            <option value="_custom">✏️ Outro (digitar)</option>
+          </select>
+        </div>
+        <div class="row" id="cShipCustomRow" style="display:none"><label>Valor do frete (£)</label><input type="number" id="cShip" step="0.01" min="0" placeholder="ex: 3.50"/></div>
+        <div id="shipHint" style="font-size:10.5px;color:var(--text3);padding:2px 0 6px;line-height:1.5">💡 Se o item passa de <b>2.5cm de espessura</b> em qualquer direção, use <b>Small Parcel</b>. Chaveiros, plaquinhas e itens planos são <b>Carta Grande</b>.</div>
+        <div class="row"><label>Margem de lucro (%)</label><input type="number" id="cMargin" placeholder="ex: 30" step="1" min="0"/></div>
+        <div class="row"><label>Taxa Ad eBay (%)</label><input type="number" id="cAd" placeholder="ex: 10" step="0.1" min="0"/></div>
         <div class="res"><span>Custo total</span><b id="rCost">£0.00</b></div>
         <div class="res big"><span>Anunciar por</span><b id="rListed">£0.00</b></div>
         <div class="res"><span style="color:var(--text3)">Comprador vê</span><b id="rBuyer" style="color:var(--text2)">£0.00</b></div>
@@ -1422,7 +1435,36 @@ function calc(){
 }
 function setCalc(p){ if(!p) return;
   $('cKg').value=p.kg??10.5; $('cGrams').value=p.grams||''; $('cHours').value=p.hours||'';
-  $('cPack').value=p.pack||''; $('cShip').value=p.ship||''; $('cMargin').value=p.margin??30; $('cAd').value=p.ad??10; calc(); }
+  $('cPack').value=p.pack??0.10; $('cShip').value=p.ship||''; $('cMargin').value=p.margin||''; $('cAd').value=p.ad||'';
+  // Sincroniza o dropdown de frete com o valor salvo
+  const presets=['0.91','1.55','1.90','2.40','2.70','2.69'];
+  const sv=p.ship? parseFloat(p.ship).toFixed(2) : '';
+  const match=presets.find(x=>x===sv);
+  $('cShipPreset').value = sv? (match||'_custom') : '';
+  $('cShipCustomRow').style.display = ($('cShipPreset').value==='_custom')? 'flex':'none';
+  calc();
+}
+function applyShipPreset(){
+  const v=$('cShipPreset').value;
+  if(v==='_custom'){ $('cShipCustomRow').style.display='flex'; setTimeout(()=>$('cShip').focus(),50); }
+  else { $('cShipCustomRow').style.display='none'; $('cShip').value = v || ''; }
+  calc();
+}
+// Auto-sugere frete quando a pessoa digita as gramas e ainda não escolheu
+function suggestShip(){
+  if($('cShipPreset').value) return; // já escolhido: não mexer
+  const g=parseFloat($('cGrams').value)||0;
+  if(g<=0) return;
+  let sug;
+  if(g<=100) sug='1.55';        // Carta grande padrão (mais comum para 3D)
+  else if(g<=250) sug='1.90';
+  else if(g<=500) sug='2.40';
+  else if(g<=750) sug='2.70';
+  else sug='2.69';               // Small Parcel
+  $('cShipPreset').value=sug; applyShipPreset();
+  toast('💡 Frete sugerido pelo peso — mude se o item passar de 2.5cm');
+}
+$('cGrams').addEventListener('change', suggestShip);
 ['cKg','cGrams','cHours','cPack','cShip','cMargin','cAd'].forEach(id=>$(id).addEventListener('input',calc));
 
 /* ---- STATUS ---- */
