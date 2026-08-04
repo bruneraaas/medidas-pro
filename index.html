@@ -24,7 +24,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 /* ── LAYOUT ── */
 #app{display:grid;grid-template-columns:330px 1fr;height:100vh}
-aside{background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:18px 16px 40px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+aside{background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:18px 16px 40px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;cursor:grab;user-select:none}
+aside.dragging{cursor:grabbing}
+aside.dragging *{pointer-events:none}
 main{display:flex;flex-direction:column;min-width:0}
 #topbar{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel)}
 #topbar .spacer{flex:1}
@@ -320,7 +322,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.3</div>
+        <div class="sub">Fotos com medidas para eBay · v3.4</div>
       </div>
     </div>
 
@@ -1570,8 +1572,7 @@ function filterLists(f){ listFilter=f;
 function renderLists(){
   const items=Object.values(L).filter(x=>!x.deleted && x.kind==='listing').sort((a,b)=>b.updated_at-a.updated_at);
   const shown=items.filter(x=> listFilter==='all'||x.status===listFilter);
-  let html='<div class="lcard" onclick="newListing()" style="display:flex;align-items:center;justify-content:center;min-height:118px;border-style:dashed"><div style="text-align:center;color:var(--accent);font-weight:600"><div style="font-size:26px;line-height:1">＋</div>Novo anúncio</div></div>';
-  html+=shown.map(x=>{ const d=x.data||{};
+  let html=shown.map(x=>{ const d=x.data||{};
     const price=d.price&&d.price.listed>0?money(d.price.listed):'—';
     const nm=(d.measures||[]).filter(m=>m.type!=='text'&&parseFloat(m.value)).length;
     return `<div class="lcard" onclick="loadListing('${x.id}')">
@@ -1580,7 +1581,7 @@ function renderLists(){
       <span class="badge ${x.status}">${statusLabel(x.status)}</span>
       <div class="lm">${nm} medida(s) · ${price}<br>${d.description?'✓ com descrição':'sem descrição'}${x.updated_by?' · '+esc(x.updated_by):''}</div>
     </div>`; }).join('');
-  if(!shown.length) html+='<div class="empty">Nenhum anúncio '+(listFilter==='all'?'ainda':'neste status')+'.</div>';
+  if(!shown.length) html='<div class="empty">Nenhum anúncio '+(listFilter==='all'?'ainda — crie um pela aba 📋 Fila ou preenchendo o editor':'neste status')+'.</div>';
   $('listGrid').innerHTML=html;
 }
 
@@ -1729,7 +1730,7 @@ function checkState(){
   const photo=photos.length>0;
   const ms=photos.some(p=>p.ms.some(m=>m.type!=='text'&&parseFloat(m.value)));
   const desc=!!(window.lastDescription&&window.lastDescription.trim().length>20);
-  const price=(parseFloat($('cGrams').value)||0)>0 || (calc().listed>0);
+  const price=(parseFloat($('cGrams').value)||0)>0 && (parseFloat($('cMargin').value)||0)>0;
   return {title,photo,ms,desc,price};
 }
 function refreshChecklist(){
@@ -1869,6 +1870,27 @@ async function downloadBackup(){
   downloadBlob(out, 'medidas-backup-'+new Date().toISOString().slice(0,10)+'.zip');
   toast('✓ Backup salvo');
 }
+
+/* ══════════ ARRASTAR PARA ROLAR A BARRA LATERAL ══════════ */
+(function(){
+  const asideEl=document.querySelector('aside');
+  if(!asideEl) return;
+  let dragging=false, startY=0, startScroll=0;
+  const blocked='input,select,button,textarea,a,.toggle,.sw,.thumb,.mrow,.chit,label,.setmain,.rm-btn';
+  asideEl.addEventListener('mousedown',e=>{
+    if(e.target.closest(blocked)) return;
+    dragging=true; startY=e.clientY; startScroll=asideEl.scrollTop;
+    asideEl.classList.add('dragging');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    asideEl.scrollTop = startScroll - (e.clientY - startY);
+  });
+  window.addEventListener('mouseup',()=>{
+    if(dragging){ dragging=false; asideEl.classList.remove('dragging'); }
+  });
+})();
 
 /* ---- INIT ---- */
 setStatus('draft'); calc(); updateAuthUI(); refreshChecklist();
