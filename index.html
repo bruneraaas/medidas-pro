@@ -302,6 +302,8 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
 .pubfoot{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
 .pubebay{background:#e53238;color:#fff;text-decoration:none;border-radius:9px;padding:11px 16px;font-weight:700;font-family:inherit;font-size:13px;display:inline-flex;align-items:center;gap:8px}
 .markpub{margin-left:auto;background:var(--accent);color:#0e0f12;border:none;border-radius:9px;padding:11px 18px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px}
+.editln{background:none;border:1px solid var(--border2);color:var(--text2);border-radius:9px;padding:11px 16px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px}
+.editln:hover{border-color:var(--accent);color:var(--accent)}
 
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--accent);color:#0e0f12;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -325,7 +327,7 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       <div class="mark">↔</div>
       <div>
         <div class="name">Medidas Pro</div>
-        <div class="sub">Fotos com medidas para eBay · v3.6</div>
+        <div class="sub">Fotos com medidas para eBay · v3.7</div>
       </div>
     </div>
 
@@ -535,20 +537,30 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
 <div class="full" id="listFull">
   <div class="full-top">
     <div class="logo" style="width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#0e0f12;font-weight:800">📚</div>
-    <div><div class="ft">Meus anúncios</div><div class="fsub">Todos os anúncios cadastrados</div></div>
+    <div><div class="ft">Meus anúncios</div><div class="fsub">Organizados por data — clique para copiar, baixar fotos e publicar</div></div>
     <span class="spacer" style="flex:1"></span>
     <span id="listSync" style="font-size:12px;color:var(--text3);margin-right:6px"></span>
     <button class="btn btn-ghost" onclick="downloadBackup()" style="padding:8px 14px;margin-right:8px">💾 Backup (.zip)</button>
     <button class="btn btn-ghost" onclick="closeLists()" style="padding:8px 16px">✕ Fechar</button>
   </div>
-  <div style="padding:18px 22px;overflow-y:auto;flex:1">
-    <div class="tabs" style="max-width:400px;margin-bottom:16px">
-      <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
-      <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
-      <button id="fReady" onclick="filterLists('ready')">Pronto</button>
-      <button id="fDone" onclick="filterLists('done')">Publicado</button>
+  <div class="full-body">
+    <div class="fcats">
+      <div class="h">Por data</div>
+      <div id="dateList"></div>
     </div>
-    <div class="grid" id="listGrid"></div>
+    <div class="fqueue">
+      <div class="fqh">
+        <span class="qt" id="listDTitle">Todas as datas</span>
+        <span class="qc" id="listDCount"></span>
+        <div class="filt">
+          <button id="fAll" class="on" onclick="filterLists('all')">Todos</button>
+          <button id="fDraft" onclick="filterLists('draft')">Rascunho</button>
+          <button id="fReady" onclick="filterLists('ready')">Pronto</button>
+          <button id="fDone" onclick="filterLists('done')">Publicado</button>
+        </div>
+      </div>
+      <div class="grid" id="listGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -589,8 +601,9 @@ details.sec[open]>summary::before{transform:rotate(90deg)}
       </div>
     </div>
     <div class="pubfoot">
+      <button class="editln" onclick="editFromPub()">✏️ Editar anúncio</button>
       <a class="pubebay" href="https://www.ebay.co.uk/sl/sell" target="_blank">🛍️ Abrir eBay para vender →</a>
-      <button class="markpub" onclick="markPublished()">✓ Marcar como Publicado</button>
+      <button class="markpub" onclick="markPubViewPublished()">✓ Marcar como Publicado</button>
     </div>
   </div>
 </div>
@@ -1418,6 +1431,7 @@ const API='https://medidas-api.bruneraasuk.workers.dev';
 let auth=JSON.parse(localStorage.getItem('medidas_auth')||'null');   // {token,username}
 let L=JSON.parse(localStorage.getItem('medidas_listings')||'{}');     // id -> item
 let curListingId=null, curStatus='draft', listFilter='all', authModeVal='login';
+let curListDate='all', pubViewId=null, pubPhotosData=[], pubOrderedPhotos=[], pubImgUrls=[];
 function saveLocal(){ localStorage.setItem('medidas_listings', JSON.stringify(L)); }
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1574,19 +1588,36 @@ function closeLists(){ $('listFull').classList.remove('open'); }
 function filterLists(f){ listFilter=f;
   [['fAll','all'],['fDraft','draft'],['fReady','ready'],['fDone','done']].forEach(([bId,v])=>$(bId).classList.toggle('on', v===f));
   renderLists(); }
+function dateKey(ts){ const d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmtDatePt(ts){ return new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).replace('.',''); }
+function pickListDate(k){ curListDate=k; renderLists(); }
 function renderLists(){
-  const items=Object.values(L).filter(x=>!x.deleted && x.kind==='listing').sort((a,b)=>b.updated_at-a.updated_at);
-  const shown=items.filter(x=> listFilter==='all'||x.status===listFilter);
-  let html=shown.map(x=>{ const d=x.data||{};
+  const all=Object.values(L).filter(x=>!x.deleted && x.kind==='listing').sort((a,b)=>b.updated_at-a.updated_at);
+  const byDate={};
+  all.forEach(x=>{ const k=dateKey(x.updated_at); (byDate[k]=byDate[k]||[]).push(x); });
+  const dateKeys=Object.keys(byDate).sort().reverse();
+
+  let dhtml=`<div class="fcat ${curListDate==='all'?'on':''}" onclick="pickListDate('all')"><span class="ic">📅</span><span class="nm">Todas</span><span class="ct">${all.length}</span></div>`;
+  dhtml+=dateKeys.map(k=>`<div class="fcat ${curListDate===k?'on':''}" onclick="pickListDate('${k}')"><span class="ic">🗓️</span><span class="nm">${fmtDatePt(byDate[k][0].updated_at)}</span><span class="ct">${byDate[k].length}</span></div>`).join('');
+  $('dateList').innerHTML = dhtml;
+
+  const activeKey = (curListDate!=='all' && byDate[curListDate]) ? curListDate : 'all';
+  if(activeKey==='all' && curListDate!=='all') curListDate='all';
+  let items = curListDate==='all' ? all : (byDate[curListDate]||[]);
+  $('listDTitle').textContent = curListDate==='all' ? 'Todas as datas' : fmtDatePt(byDate[curListDate][0].updated_at);
+  items = items.filter(x=> listFilter==='all'||x.status===listFilter);
+  $('listDCount').textContent = items.length+(items.length===1?' anúncio':' anúncios');
+
+  let html=items.map(x=>{ const d=x.data||{};
     const price=d.price&&d.price.listed>0?money(d.price.listed):'—';
     const nm=(d.measures||[]).filter(m=>m.type!=='text'&&parseFloat(m.value)).length;
-    return `<div class="lcard" onclick="loadListing('${x.id}')">
+    return `<div class="lcard" onclick="openPubFor('${x.id}')">
       <button class="lx" onclick="event.stopPropagation();delListing('${x.id}')">🗑</button>
       <div class="ln">${esc(x.name)}</div>
       <span class="badge ${x.status}">${statusLabel(x.status)}</span>
       <div class="lm">${nm} medida(s) · ${price}<br>${d.description?'✓ com descrição':'sem descrição'}${x.updated_by?' · '+esc(x.updated_by):''}</div>
     </div>`; }).join('');
-  if(!shown.length) html='<div class="empty">Nenhum anúncio '+(listFilter==='all'?'ainda — crie um pela aba 📋 Fila ou preenchendo o editor':'neste status')+'.</div>';
+  if(!items.length) html='<div class="empty">Nenhum anúncio '+(listFilter==='all'?'aqui — crie um pela aba 📋 Fila ou preenchendo o editor':'neste status')+'.</div>';
   $('listGrid').innerHTML=html;
 }
 
@@ -1687,7 +1718,7 @@ function renderQueue(){
   }).join('') : '<div style="text-align:center;color:var(--text3);padding:50px">Nenhum produto aqui. Cole um link acima para adicionar.</div>';
 }
 function pickCat(id){ curCat=id; renderFila(); }
-function filaFilter(f,el){ filaFilt=f; document.querySelectorAll('.fqh .filt button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); renderQueue(); }
+function filaFilter(f,el){ filaFilt=f; document.querySelectorAll('#filaFull .fqh .filt button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); renderQueue(); }
 function addCategory(){
   const nm=prompt('Nome da categoria (ex: Chaveiros, Fórmula 1):'); if(!nm||!nm.trim()) return;
   const ic=(prompt('Um emoji para o ícone (opcional):','📁')||'📁').trim()||'📁';
@@ -1758,16 +1789,17 @@ const _origSetStatus=setStatus;
 setStatus=function(s){ const st=checkState(); const ready=Object.values(st).every(Boolean); if((s==='ready'||s==='done')&&!ready){ toast('Complete o checklist antes de marcar como '+(s==='ready'?'Pronto':'Publicado')); return; } _origSetStatus(s); refreshChecklist(); };
 
 /* ══════════ LIGHTBOX ══════════ */
-let lbIdx=0;
-function openLB(i){
-  if(!photos.length) return;
-  lbIdx=Math.max(0,Math.min(i, photos.length-1));
+let lbIdx=0, lbList=null;
+function openLB(i, list){
+  lbList = list || photos;
+  if(!lbList.length) return;
+  lbIdx=Math.max(0,Math.min(i, lbList.length-1));
   renderLB(); $('lb').classList.add('open');
 }
 function closeLB(){ $('lb').classList.remove('open'); }
-function lbNav(d){ lbIdx=(lbIdx+d+photos.length)%photos.length; renderLB(); }
+function lbNav(d){ lbIdx=(lbIdx+d+lbList.length)%lbList.length; renderLB(); }
 function renderLB(){
-  const p=photos[lbIdx]; if(!p) return closeLB();
+  const p=lbList[lbIdx]; if(!p) return closeLB();
   const c=document.createElement('canvas'), img=p.img;
   c.width=img.naturalWidth; c.height=img.naturalHeight;
   const x=c.getContext('2d');
@@ -1775,11 +1807,11 @@ function renderLB(){
   x.drawImage(img,0,0);
   (p.ms||[]).forEach(m=>drawMeasure(x,m,0,0,c.width,c.height,false));
   $('lbImg').src=c.toDataURL('image/jpeg',0.94);
-  $('lbTitle').textContent = `Foto ${lbIdx+1} de ${photos.length}${p.main?' (PRINCIPAL)':''}`;
+  $('lbTitle').textContent = `Foto ${lbIdx+1} de ${lbList.length}${p.main?' (PRINCIPAL)':''}`;
   $('lbSize').textContent = ` · original ${img.naturalWidth} × ${img.naturalHeight} px`;
 }
 async function lbDownload(){
-  const p=photos[lbIdx]; if(!p) return;
+  const p=lbList[lbIdx]; if(!p) return;
   const b=await exportPhoto(p);
   downloadBlob(b,(p.name||'foto')+'-medidas.jpg');
 }
@@ -1815,11 +1847,32 @@ async function fetchPhoto(meta){
 function photosSerialize(){ return photos.map(p=>({rid:p.rid,name:p.name,main:!!p.main,ms:cleanMs(p.ms),bbox:p.bbox})); }
 
 /* ══════════ PUBLICAR ══════════ */
-$('openPubBtn').onclick=openPub;
-function openPub(){ if(!curListingId){ toast('Salve o anúncio primeiro'); return; } renderPub(); $('pubOv').classList.add('open'); }
-function closePub(){ $('pubOv').classList.remove('open'); }
-function renderPub(){
-  const it=L[curListingId]; if(!it) return;
+$('openPubBtn').onclick=()=>openPubFor(curListingId, photos);
+
+async function openPubFor(id, liveePhotos){
+  if(!id){ toast('Salve o anúncio primeiro'); return; }
+  const it=L[id]; if(!it) return;
+  pubViewId=id;
+  $('pubOv').classList.add('open');
+  fillPubText(it);
+  $('pubPhotos').innerHTML='<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">Carregando fotos…</div>';
+  $('pubPhCount').textContent='…';
+  let list=[];
+  if(liveePhotos && liveePhotos.length){
+    list=liveePhotos;
+  } else if(auth){
+    const metas=(it.data&&it.data.photos)||[];
+    for(const meta of metas){
+      const r=await fetchPhoto(meta);
+      if(r) list.push({img:r.img, url:r.url, ms:(meta.ms||[]).map(m=>Object.assign({},m)), bbox:meta.bbox||null, main:!!meta.main, name:meta.name});
+    }
+  }
+  // se o popup foi fechado enquanto as fotos carregavam, não sobrescreve
+  if(pubViewId!==id) return;
+  pubPhotosData=list;
+  await renderPubPhotos();
+}
+function fillPubText(it){
   const d=it.data||{};
   $('pubTitle').textContent = d.title || it.name || '';
   const cc=(d.title||it.name||'').length; const el=$('pubTitleCC'); el.textContent=cc+' / 80'; el.classList.toggle('warn',cc>80);
@@ -1827,31 +1880,64 @@ function renderPub(){
   $('pubShip').textContent  = d.price&&d.price.ship ? money(d.price.ship) : '£0.00';
   $('pubDesc').textContent  = d.description || '(sem descrição)';
   $('pubSrc').innerHTML = d.sourceLink ? '🔗 <a href="'+esc(d.sourceLink)+'" target="_blank" style="color:#5aa9e6">'+esc(d.sourceLink.replace(/^https?:\/\//,'').slice(0,50))+'</a>' : '';
-  const ordered = [...(cur?photos:[])].sort((a,b)=>(b.main?1:0)-(a.main?1:0));
-  $('pubPhotos').innerHTML = ordered.map((p,i)=>`<div class="pubph ${p.main?'main':''}" onclick="openLB(${photos.indexOf(p)})"><img src="${p.url}"/><span class="lbl ${p.main?'p':''}">${i+1}${p.main?' PRINCIPAL':''}</span></div>`).join('') || '<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">Sem fotos carregadas — abra o anúncio no editor primeiro.</div>';
-  $('pubPhCount').textContent=ordered.length+(ordered.length===1?' foto':' fotos');
   $('pubTip').innerHTML = '💡 <b>Ao publicar no eBay lembre-se:</b> ✓ escolher a categoria certa &nbsp; ✓ conferir peso do item para o frete &nbsp; ✓ material (PLA) &nbsp; ✓ condição: Novo';
 }
+function revokePubUrls(){ pubImgUrls.forEach(u=>{ try{URL.revokeObjectURL(u);}catch(e){} }); pubImgUrls=[]; }
+async function renderPubPhotos(){
+  revokePubUrls();
+  const ordered=[...pubPhotosData].sort((a,b)=>(b.main?1:0)-(a.main?1:0));
+  pubOrderedPhotos=ordered;
+  if(!ordered.length){
+    const msg = (!auth && !(pubPhotosData===photos)) ? 'Entre na sua conta para carregar as fotos deste anúncio.' : 'Sem fotos guardadas para este anúncio.';
+    $('pubPhotos').innerHTML = `<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center;grid-column:1/-1">${msg}</div>`;
+    $('pubPhCount').textContent='0';
+    return;
+  }
+  const parts=[];
+  for(let i=0;i<ordered.length;i++){
+    const p=ordered[i];
+    const blob=await exportPhoto(p);          // mesma foto que vai pro eBay: resolução total + medidas desenhadas
+    const url=URL.createObjectURL(blob);
+    pubImgUrls.push(url);
+    parts.push(`<div class="pubph ${p.main?'main':''}" onclick="openLB(${i},pubOrderedPhotos)"><img src="${url}"/><span class="lbl ${p.main?'p':''}">${i+1}${p.main?' PRINCIPAL':''}</span></div>`);
+  }
+  $('pubPhotos').innerHTML = parts.join('');
+  $('pubPhCount').textContent = ordered.length+(ordered.length===1?' foto':' fotos');
+}
+function closePub(){ $('pubOv').classList.remove('open'); pubViewId=null; revokePubUrls(); }
 function cpFrom(id,btn,priceStripPound){
   let t=$(id).textContent; if(priceStripPound) t=t.replace('£','');
   navigator.clipboard.writeText(t).then(()=>{ btn.textContent='✓ Copiado'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent='Copiar'; btn.classList.remove('done'); },1500); });
 }
 $('dlZipBtn').onclick=async()=>{
-  const b=$('dlZipBtn'); b.disabled=true; b.textContent='Preparando…';
+  const b=$('dlZipBtn');
+  if(!pubOrderedPhotos.length){ toast('Sem fotos para baixar'); return; }
+  b.disabled=true; b.textContent='Preparando…';
   try{
     const zip=new JSZip();
-    for(let i=0;i<photos.length;i++){
-      const p=photos[i]; const blob=await exportPhoto(p);
+    for(let i=0;i<pubOrderedPhotos.length;i++){
+      const p=pubOrderedPhotos[i]; const blob=await exportPhoto(p);
       const label = p.main? '01-principal' : String(i+1).padStart(2,'0');
       zip.file(`${label}.jpg`, blob);
     }
     const out=await zip.generateAsync({type:'blob'});
-    downloadBlob(out, (($('listTitle').value.trim()||'anuncio').replace(/[^\w-]+/g,'-'))+'-fotos.zip');
+    const it=L[pubViewId];
+    const nm=(it&&(it.data.title||it.name))||'anuncio';
+    downloadBlob(out, nm.replace(/[^\w-]+/g,'-')+'-fotos.zip');
     b.textContent='✓ Baixado';
   }catch(e){ b.textContent='Erro'; toast('Erro no ZIP: '+e.message); }
   setTimeout(()=>{ b.disabled=false; b.textContent='⬇ Baixar todas as fotos (.zip)'; },1800);
 };
-async function markPublished(){ setStatus('done'); await saveListing(); closePub(); toast('✓ Marcado como Publicado'); }
+async function editFromPub(){ const id=pubViewId; closePub(); await loadListing(id); }
+async function markPubViewPublished(){
+  const it=L[pubViewId]; if(!it) return;
+  it.status='done'; it.updated_at=Date.now(); it._dirty=true; saveLocal();
+  if(auth){ const ok=await pushItem(it); if(ok){ it._dirty=false; saveLocal(); } }
+  if(curListingId===pubViewId){ _origSetStatus('done'); refreshChecklist(); }
+  toast('✓ Marcado como Publicado');
+  closePub();
+  renderLists();
+}
 
 /* ══════════ BACKUP COMPLETO (.zip) ══════════ */
 async function downloadBackup(){
